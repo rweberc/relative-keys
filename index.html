@@ -1,1 +1,102 @@
-page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Piano Keyboard</title>
+    <style>
+        .piano {
+            display: flex;
+            align-items: flex-start;
+        }
+        .white-key, .black-key {
+            border: 1px solid #000;
+            cursor: pointer;
+            user-select: none;
+        }
+        .white-key {
+            background-color: white;
+            height: 100px;
+            width: 30px;
+        }
+        .black-key {
+            background-color: black;
+            height: 60px;
+            width: 20px;
+            position: relative;
+            margin-left: -10px;
+            margin-right: -10px;
+            z-index: 1;
+        }
+        .active {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <label for="musical-notes">Select a reference note:</label>
+    <select id="ref-note" name="ref-note" onchange="updateRefNote(this)">
+        <option value="C">C</option>
+        <option value="C#">C#</option>
+        <option value="D">D</option>
+        <option value="D#">D#</option>
+        <option value="E">E</option>
+        <option value="F">F</option>
+        <option value="F#">F#</option>
+        <option value="G">G</option>
+        <option value="G#">G#</option>
+        <option value="A">A</option>
+        <option value="A#">A#</option>
+        <option value="B">B</option>
+    </select>
+    <br>
+    <br>
+    <label for="tempo-slider">Adjust tempo:</label>
+    <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="120" onchange="updateBPM(this)">
+    <br>
+    <br>
+    <div class="piano">
+        <div class="white-key" onclick="toggleNote(0, this)"></div>
+        <div class="black-key" onclick="toggleNote(1, this)"></div>
+        <div class="white-key" onclick="toggleNote(2, this)"></div>
+        <div class="black-key" onclick="toggleNote(3, this)"></div>
+        <div class="white-key" onclick="toggleNote(4, this)"></div>
+        <div class="white-key" onclick="toggleNote(5, this)"></div>
+        <div class="black-key" onclick="toggleNote(6, this)"></div>
+        <div class="white-key" onclick="toggleNote(7, this)"></div>
+        <div class="black-key" onclick="toggleNote(8, this)"></div>
+        <div class="white-key" onclick="toggleNote(9, this)"></div>
+        <div class="black-key" onclick="toggleNote(10, this)"></div>
+        <div class="white-key" onclick="toggleNote(11, this)"></div>
+        <div class="white-key" onclick="toggleNote(12, this)"></div>
+    </div>
+</body>
+<script>
+    function toggleNote(index, keyElement) {
+        // console.log('Playing note:', note);
+        scaleNotes[index][4] = !scaleNotes[index][4];
+
+        // Toggle the active class to change the color of the clicked key
+        keyElement.classList.toggle('active');
+    }
+
+    function updateRefNote(selectElement) {
+        refNote = selectElement.value + '3'; // later, add option to randomize selection of octave
+    }
+
+    function updateBPM(sliderElement) {
+        bpm = sliderElement.value;
+    }
+</script>
+
+<script src=https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js></script>
+
+<script src=https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js></script>
+
+<button id="play-button">Play/Pause</button>
+
+<button id="shuffle-button">Shuffle Notes</button>
+
+<script src="create.js"></script>
+</html>
+
