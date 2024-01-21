@@ -71,7 +71,7 @@ createRefNoteSynth = function() {
   
   refNoteSynth.set({
     oscillator: {
-      type: "triangle"
+      type: "sine"
     }
     // filter: {
     //     type: "highpass",
@@ -127,7 +127,33 @@ let resSynth = new Tone.PolySynth({
 }).toDestination();
 
 // let refNoteSynth = new Tone.PolySynth().toMaster();
-let chordSynth = new Tone.PolySynth().toDestination();
+let chordSynth = new Tone.PolySynth();
+
+chordSynth.set({
+  volume: -10,
+  oscillator: {
+    type: "sine"
+  }
+  // filter: {
+  //     type: "highpass",
+  //     rolloff: 0,
+  //     Q: 100
+  // },
+  // filterEnvelope: {
+  //  attack: 1,
+  //  decay: 0.32,
+  //  sustain: 0.9,
+  //  release: 3,
+  //  baseFrequency: 0,
+  //  octaves: 4
+  // }
+  });
+  
+  chordSynth.toDestination();
+
+
+const chord_filter = new Tone.Filter(50, "lowpass").toDestination();
+chordSynth.connect(chord_filter);
 
 // // Reverb Setup
 const rev = new Tone.Reverb({
