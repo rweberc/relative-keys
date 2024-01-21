@@ -87,6 +87,8 @@
     function updateBPM(sliderElement) {
         bpm = sliderElement.value;
     }
+
+</script>
 </script>
 
 <script src=https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js></script>
@@ -97,6 +99,35 @@
 
 <button id="shuffle-button">Shuffle Notes</button>
 
+<input type="range" id="synth-slider" name="synth" min="0" max="3000" onchange="test_fn(this)">
+
+<!-- onmousemove -->
+
 <script src="create.js"></script>
+<script>
+    function test_fn(t) {
+
+        filter.frequency.value = t.value;
+        // //refNoteSynth.volume.value = parseInt(t.value);
+        // //refNoteSynth.oscillator.type = "sine";
+        // refNoteSynth.set({
+        // harmonicity: t.value,
+        // //detune: t.value,
+        // // envelope: {
+        // //     attack: 0.01,
+        // // },
+        // oscillator: {
+        //     type: "square"
+        // }
+        // filter: {
+        //     Q: t.value
+        // }
+        // });
+
+    }
+
+
+</script>
+
 </html>
 

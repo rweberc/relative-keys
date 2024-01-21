@@ -22,7 +22,7 @@ let majorScaleNumbers = [0, 2, 4, 5, 7, 9, 11];
 
 let relativeKeyNotes;
 
-let measureRepeats = 3;
+let measureRepeats = 7;
 
 let currentMeasure = 1;
 
@@ -43,34 +43,62 @@ let refNoteSynth;
 createRefNoteSynth = function() {
 
   refNoteSynth = new Tone.PolySynth({
+    // "oscillator": {
+    //   "type": "sawtooth"
+    // }
+    // "volume": 0,
+    // "detune": 0,
+    // "portamento": 0,
+    // "filter": {
+    //   "type": "lowpass"
+    // },
+    // "envelope": {
+    //   "attack": 0.005,
+    //   "attackCurve": "linear",
+    //   "decay": 0.1,
+    //   "decayCurve": "exponential",
+    //   "release": 1,
+    //   "releaseCurve": "exponential",
+    //   "sustain": 0.3
+    // },
+    // "oscillator": {
+    //   "partialCount": 0,
+    //   "partials": [],
+    //   "phase": 0,
+    //   "type": "sawtooth"
+    // }
+  });
+  
+  refNoteSynth.set({
     oscillator: {
-      type: "square",
-    },
-    envelope: {
-      attack: 8,
-      decay: 16,
-      sustain: 20,
-      release: 20,
-    },
-    filter: {
-      type: "highpass",
-      rolloff: -5,
-      Q: -2,
-    },
-    filterEnvelope: {
-      attack: 0,
-      decay: 8,
-      sustain: 4,
-      release: 16,
-      baseFrequency: 400,
-      octaves: 4,
-      exponent: 2,
-    },
-  }).toDestination();
+      type: "triangle"
+    }
+    // filter: {
+    //     type: "highpass",
+    //     rolloff: 0,
+    //     Q: 100
+    // },
+    // filterEnvelope: {
+    //  attack: 1,
+    //  decay: 0.32,
+    //  sustain: 0.9,
+    //  release: 3,
+    //  baseFrequency: 0,
+    //  octaves: 4
+    // }
+    });
+    
+    refNoteSynth.toDestination();
+
+    // filter.frequency.rampTo(20000, 10);
+    refNoteSynth.connect(filter);
 
 }
 
+const filter = new Tone.Filter(100, "lowpass").toDestination();
+
 createRefNoteSynth();
+
 
 let resSynth = new Tone.PolySynth({
   oscillator: {
@@ -101,6 +129,24 @@ let resSynth = new Tone.PolySynth({
 // let refNoteSynth = new Tone.PolySynth().toMaster();
 let chordSynth = new Tone.PolySynth().toDestination();
 
+// // Reverb Setup
+const rev = new Tone.Reverb({
+  decay : 5 ,
+  preDelay : 0.01,
+  wet: 1
+}).toDestination();
+
+// Delay Setup
+const pingPong = new Tone.PingPongDelay({
+  delayTime: '16n',
+  feedback: .8,
+  wet: .75
+}).toDestination();
+
+chordSynth.connect(pingPong);
+chordSynth.connect(rev);
+
+
 // // add lfo to refNoteSynth
 // // Create an LFO to modulate the amplitude of the synth
 // const lfo = new Tone.LFO(.15, .5, 1).start();
@@ -122,7 +168,7 @@ let resPart;
 
 let refNote = "C4";
 let chordNotes = [["C3", "E3", "G3"], ["F3", "A3", "C4"], ["G3", "B3", "D4"], ["C3", "E3", "G3"]];
-let bpm = 240;
+let bpm = 100;
 
 // function to add chords to pattern
 function createKeyCenterPattern(refNote, scaleNoteDegree) { // later take in key as argument
@@ -267,6 +313,7 @@ function speakNumber(number) {
 
   let utterance = new SpeechSynthesisUtterance(note);
   utterance.volume = 1; // From 0 to 1
+  utterance.pitch = .9;
   // var voices = window.speechSynthesis.getVoices();
   // utterance.voice = voices[10]; 
   speechSynthesis.speak(utterance);
@@ -384,7 +431,7 @@ resolutionPartFunction = function(time) {
 function createResolutionPattern(relativeKeyNotes) {
 
   // Calculate the duration of one measure in seconds
-  const secondsPerBeat = 60.0 / bpm;
+  const secondsPerBeat = 60.0 / Tone.Transport.bpm.value;
   const secondsPerHalfMeasure = secondsPerBeat * 2;
 
   let refNoteIndex = removeNumber(relativeKeyNotes).indexOf(removeNumber(refNote));
@@ -444,6 +491,25 @@ function createResolutionPattern(relativeKeyNotes) {
 
 }
   
+// document.getElementById("synth-slider").addEventListener("onchange", function() {
+
+//   //refNoteSynth.volume.value = -100;
+//   refNoteSynth.set({
+//     harmonicity: 10,
+//     envelope: {
+//         attack: 0.01,
+//     },
+//     oscillator: {
+//         type: "square"
+//     },
+//     filter: {
+//         rolloff: -50,
+//     }
+//     });
+
+
+// });
+
 
 document.getElementById("play-button").addEventListener("click", function() {
 
