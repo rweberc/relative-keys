@@ -58,16 +58,16 @@
     <div class="piano">
         <div class="white-key" onclick="toggleNote(0, this)"></div>
         <div class="black-key" onclick="toggleNote(1, this)"></div>
-        <div class="white-key" onclick="toggleNote(2, this)"></div>
+        <div class="white-key active" onclick="toggleNote(2, this)"></div>
         <div class="black-key" onclick="toggleNote(3, this)"></div>
-        <div class="white-key" onclick="toggleNote(4, this)"></div>
-        <div class="white-key" onclick="toggleNote(5, this)"></div>
+        <div class="white-key active" onclick="toggleNote(4, this)"></div>
+        <div class="white-key active" onclick="toggleNote(5, this)"></div>
         <div class="black-key" onclick="toggleNote(6, this)"></div>
-        <div class="white-key" onclick="toggleNote(7, this)"></div>
+        <div class="white-key active" onclick="toggleNote(7, this)"></div>
         <div class="black-key" onclick="toggleNote(8, this)"></div>
-        <div class="white-key" onclick="toggleNote(9, this)"></div>
+        <div class="white-key active" onclick="toggleNote(9, this)"></div>
         <div class="black-key" onclick="toggleNote(10, this)"></div>
-        <div class="white-key" onclick="toggleNote(11, this)"></div>
+        <div class="white-key active" onclick="toggleNote(11, this)"></div>
         <div class="white-key" onclick="toggleNote(12, this)"></div>
     </div>
 </body>
@@ -99,12 +99,17 @@
 
 <button id="shuffle-button">Shuffle Notes</button>
 
-<input type="range" id="synth-slider" name="synth" min="0" max="3000" onchange="test_fn(this)">
+<p id="current-note">Current solfege note: . . .</p>
 
-<!-- onmousemove -->
+<p>Reference Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" oninput="refsynthvol(this)"></p>
+<p>Resolution Note Volume <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" oninput="ressynthvol(this)"></p>
+<p>Chord Volume <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" oninput="chordsynthvol(this)"></p>
 
 <script src="create.js"></script>
 <script>
+    function refsynthvol(t) { refNoteSynth.volume.value = t.value;}
+    function ressynthvol(t) { resSynth.volume.value = t.value;}
+    function chordsynthvol(t) { chordSynth.volume.value = t.value;}
     function test_fn(t) {
 
         filter.frequency.value = t.value;

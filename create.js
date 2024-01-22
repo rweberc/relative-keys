@@ -3,14 +3,14 @@
 // array to hold ordered note resources
 let scaleNotes = [  ['C', 'do', 'doe', '1', 0],
                     ['C#', 'di', 'dee', '2b', 0],
-                    ['D', 're', 'ray', '2', 0],
+                    ['D', 're', 'ray', '2', 1],
                     ['D#', 'ri', 'ree', '3b', 0],
-                    ['E', 'mi', 'me', '3', 0],
-                    ['F', 'fa', 'fa', '4', 0],
+                    ['E', 'mi', 'me', '3', 1],
+                    ['F', 'fa', 'fa', '4', 1],
                     ['F#', 'fi', 'fee', '5b', 0],
-                    ['G', 'sol', 'sole', '5', 0],
+                    ['G', 'sol', 'sole', '5', 1],
                     ['G#', 'si', 'see', '6b', 0],
-                    ['A', 'la', 'la', '6', 0],
+                    ['A', 'la', 'la', '6', 1],
                     ['A#', 'li', 'lee', '7b', 0],
                     ['B', 'ti', 'tee', '7', 0]
                     ];
@@ -22,12 +22,13 @@ let majorScaleNumbers = [0, 2, 4, 5, 7, 9, 11];
 
 let relativeKeyNotes;
 
-let measureRepeats = 7;
+let measureRepeats = 2;
 
 let currentMeasure = 1;
 
 let scaleNoteDegree;
 
+let repeatId;
 
 // Number of measures for loop
 let scheduleRepeatMeasure = "4m";
@@ -194,7 +195,7 @@ let resPart;
 
 let refNote = "C4";
 let chordNotes = [["C3", "E3", "G3"], ["F3", "A3", "C4"], ["G3", "B3", "D4"], ["C3", "E3", "G3"]];
-let bpm = 100;
+let bpm = 220;
 
 // function to add chords to pattern
 function createKeyCenterPattern(refNote, scaleNoteDegree) { // later take in key as argument
@@ -277,9 +278,20 @@ function getContextMajorScale(refNote, scaleDegreeNote) {
   // function to randomize which relative scale degree is used based on which values of scaleNotes.map(item => item[3]) are true
 function randomizeScaleDegree(scaleNotes) {
     
-        let scaleDegrees = scaleNotes.filter(item => item[4] == true).map(item => item[0]);
+        let scaleDegrees;
+        
+        if (scaleNoteDegree === undefined | scaleNotes.filter(item => item[4] == true).length == 1)
+          scaleDegrees = scaleNotes.filter(item => item[4] == true).map(item => item[0]);
+        else 
+          scaleDegrees = scaleNotes.filter(item => item[0] != scaleNoteDegree).filter(item => item[4] == true).map(item => item[0]);
 
-        return scaleDegrees[Math.floor(Math.random() * scaleDegrees.length)];
+        let newNote = scaleDegrees[Math.floor(Math.random() * scaleDegrees.length)];
+
+        let newSolfegeNote = scaleNotes.filter(item => item[0] == newNote).map(item => item[1]);
+
+        document.getElementById('current-note').textContent = "Current solfege note: " + newSolfegeNote;
+
+        return newNote;
 
 }
 
@@ -396,6 +408,7 @@ refNotePartFunction = function(time) {
 }
 
 chordPartFunction = function(time) {
+  console.debug("Called chordPartFunction, time: " + time); 
 
   if (chordPart !== undefined) {
     chordPart.dispose();
@@ -406,11 +419,14 @@ chordPartFunction = function(time) {
   // deciding on the key advance here should be moved
   if (currentMeasure == 1) {
       scaleNoteDegree = randomizeScaleDegree(scaleNotes); // should remove current scaleNoteDegree from options
+      console.debug(currentMeasure); 
       currentMeasure += 1;
-  } else if (currentMeasure <= measureRepeats) {
+  } else if (currentMeasure <= measureRepeats - 1) {
+      console.debug(currentMeasure); 
       currentMeasure += 1;
-  } else if (currentMeasure > measureRepeats) {
-      scaleNoteDegree = randomizeScaleDegree(scaleNotes); // should remove current scaleNoteDegree from options
+  } else if (currentMeasure > measureRepeats - 1) {
+      //scaleNoteDegree = randomizeScaleDegree(scaleNotes); // should remove current scaleNoteDegree from options
+      console.debug(currentMeasure); 
       currentMeasure = 1;
   }
 
@@ -437,7 +453,7 @@ resolutionPartFunction = function(time) {
     // chordNotes = chordNotes;
 
     // deciding on the key advance here should be moved
-    let scaleNoteDegree = randomizeScaleDegree(scaleNotes);
+    // let scaleNoteDegree = randomizeScaleDegree(scaleNotes);
 
     resPart = new Tone.Part(
       function(time, note) {
@@ -543,7 +559,7 @@ document.getElementById("play-button").addEventListener("click", function() {
 
         //createSequence();
         //createPart();
-        Tone.Transport.scheduleRepeat((time) => {
+        repeatId = Tone.Transport.scheduleRepeat((time) => {
 
           Tone.Transport.bpm.value = bpm;
 
@@ -561,10 +577,13 @@ document.getElementById("play-button").addEventListener("click", function() {
   
     } else {
       // refNoteSynth.volume.value = -100;
+      currentMeasure = 1;
       refNoteSynth.releaseAll();
       refNoteSynth.dispose();
       createRefNoteSynth();
+      Tone.Transport.cancel(repeatId);
       Tone.Transport.stop();
+      
   
     }
   
