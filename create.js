@@ -12,7 +12,7 @@ let scaleNotes = [  ['C', 'do', 'doe', '1', 0],
                     ['G#', 'si', 'see', '6b', 0],
                     ['A', 'la', 'la', '6', 1],
                     ['A#', 'li', 'lee', '7b', 0],
-                    ['B', 'ti', 'tee', '7', 0]
+                    ['B', 'ti', 'tee', '7', 1]
                     ];
 
 // example of how to call column [2] and row [3]scaleNotes.map(item => item[2])[3]
