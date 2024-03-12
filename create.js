@@ -22,9 +22,13 @@ let majorScaleNumbers = [0, 2, 4, 5, 7, 9, 11];
 
 let relativeKeyNotes;
 
-let measureRepeats = 2;
+let measureRepeats = 4;
 
 let currentMeasure = 1;
+
+let roundsBeforeReturnToBase = 4;
+
+let rounds = 1;
 
 let scaleNoteDegree;
 
@@ -193,8 +197,14 @@ let refNotePart;
 let chordPart;
 let resPart;
 
+let melodyNotePart;
+let melodyChordNotePart;
+
 let refNote = "C4";
 let chordNotes = [["C3", "E3", "G3"], ["F3", "A3", "C4"], ["G3", "B3", "D4"], ["C3", "E3", "G3"]];
+
+let melodyNotes = ["D", "E", "F", "G"];
+
 let bpm = 220;
 
 // function to add chords to pattern
@@ -205,8 +215,6 @@ function createKeyCenterPattern(refNote, scaleNoteDegree) { // later take in key
 
   let relativeKeyRoot = getContextMajorScale(refNote, scaleNoteDegree);
 
-  // again, shouldn't happen here...
-  // get resolution notes
   relativeKeyNotes = getSelectedNotes(scaleNotes.map(item => item[0]), keyOctaveNum, relativeKeyRoot, majorScaleNumbers);
 
   chordNotes = constructChords(relativeKeyNotes);
@@ -225,7 +233,37 @@ function createRefNotePattern(refNote) { // later take in key as argument
   // return [["2:2", refNote]]; //refNotes[0]];
   return [["0:0", refNote]];//refNotes[0]];
 }
+
+// function to create reference note patttern
+function createMelodyNotePattern() { // later take in key as argument
+
+  melodyNotes = scaleNotes.filter(item => item[4] == true).map(item => item[0]);
+  melody_note_ct = document.getElementById('re-base-input').value;
+  melodyNotes = getRandomElements(melodyNotes, melody_note_ct);
+
+  // return [["2:2", refNote]]; //refNotes[0]];
+  return [["2:0", melodyNotes[0] + keyOctaveNum], 
+          ["2:2", melodyNotes[1] + keyOctaveNum], 
+          ["2:4", melodyNotes[2] + keyOctaveNum], 
+          ["2:6", melodyNotes[3] + keyOctaveNum]]; // update to be the several notes...
+}
+
+function getRandomElements(arr, count) {
+  let result = [];
+  for(let i = 0; i < count; i++) {
+      result.push(arr[Math.floor(Math.random() * arr.length)]);
+  }
+  return result;
+}
  
+// Need to create the chords and add that function call to the Melody Note call? 
+// for create the chords... reateKeyCenterPattern(randomize...C4 etc. from scalenotes ... add the "4", 'C')
+// Also, for calculating the solfege melody in the different chord changes... do getOrderedNotes, based on key as root
+// Calculate melody note - key in that... if >= 0..just take that [diff] solfege from scalednotes, if < 0, do [12-diff]
+// Later add in a blank part for silently singing ahead of time 
+// Add in option to shuffle melody... just calls createmelodypattern again...
+
+
 const getOrderedNotes = (allNotes, rootNote) => {
 
     const startNote = allNotes.indexOf(rootNote);
@@ -275,7 +313,7 @@ function getContextMajorScale(refNote, scaleDegreeNote) {
   
 }
 
-  // function to randomize which relative scale degree is used based on which values of scaleNotes.map(item => item[3]) are true
+// function to randomize which relative scale degree is used based on which values of scaleNotes.map(item => item[3]) are true
 function randomizeScaleDegree(scaleNotes) {
     
         let scaleDegrees;
@@ -383,8 +421,6 @@ refNotePartFunction = function(time) {
     refNotePart.dispose();
   }
 
-  //refNote = refNote;
-
   refNotePart = new Tone.Part(
     function(time, note) {
       refNoteSynth.triggerAttackRelease(note, "4m", time); //note, "10hz", time);
@@ -395,16 +431,6 @@ refNotePartFunction = function(time) {
 
   // Setup the synth to be ready to play on beat 1
   refNotePart.start();//.loop = "true";
-
-  // synth.triggerAttackRelease("B4", "8n", "+0:0:1");
-  // synth.triggerAttackRelease("A4", "8n", "+0:1:1");
-  // synth.triggerAttackRelease("D4", "8n", "+0:2:1");
-  // synth.triggerAttackRelease("C4", "8n", "+0:3:1");
-  // synth.triggerAttackRelease("F4", "8n", "+1:0:1");
-  // synth.triggerAttackRelease("E4", "8n", "+1:1:1");
-  // synth.triggerAttackRelease("A5", "8n", "+1:2:1");
-  // synth.triggerAttackRelease("G4", "8n", "+1:3:1");
-
 }
 
 chordPartFunction = function(time) {
@@ -441,7 +467,6 @@ chordPartFunction = function(time) {
   // Setup the synth to be ready to play on beat 1
   chordPart.start();//.loop = "true";
 
-
 }
 
 resolutionPartFunction = function(time) {
@@ -465,6 +490,86 @@ resolutionPartFunction = function(time) {
 
     // Setup the synth to be ready to play on beat 1
     resPart.start();//.loop = "true";
+
+}
+
+melodyNotePartFunction = function(time) {
+
+  if (melodyNotePart !== undefined) {
+    melodyNotePart.dispose();
+  }
+
+  melodyNotePart = new Tone.Part(
+    function(time, note) {
+      refNoteSynth.triggerAttackRelease(note, "10hz", time); //note, "10hz", time);
+    },
+    createMelodyNotePattern()
+  );
+
+
+  // Setup the synth to be ready to play on beat 1
+  melodyNotePart.start();//.loop = "true";
+}
+
+
+melodyChordNotePartFunction = function(time) {
+
+  if (melodyChordNotePart !== undefined) {
+    melodyChordNotePart.dispose();
+  }
+
+  // TODO: choosing of the chord change... 
+  // Maybe for now, just have it do every other... later... pick how many measures until return to reference/C base
+  if (currentMeasure == 1) {
+
+    if (rounds == 1) {
+
+      scaleNoteDegree = "C"; 
+      rounds = (rounds % roundsBeforeReturnToBase) + 1;
+
+    } else if (rounds < roundsBeforeReturnToBase) {
+
+      rounds += 1;
+      scaleNoteDegree = scaleNotes.filter(item => item[0] != scaleNoteDegree).map(item => item[0])[Math.floor(Math.random() * scaleDegrees.length - 1)];
+
+    }
+        
+    console.debug(currentMeasure); 
+    currentMeasure += 1;
+} else if (currentMeasure <= measureRepeats - 1) {
+    console.debug(currentMeasure); 
+    currentMeasure += 1;
+} else if (currentMeasure > measureRepeats - 1) {
+    //scaleNoteDegree = randomizeScaleDegree(scaleNotes); // should remove current scaleNoteDegree from options
+    console.debug(currentMeasure); 
+    currentMeasure = 1;
+}
+
+
+
+  melodyChordNotePart = new Tone.Part(
+    function(time, note) {
+      chordSynth.triggerAttackRelease(note, "10hz", time); //note, "10hz", time);
+    },
+    createMelodyChordPattern(scaleNoteDegree)
+  );
+
+
+  // Setup the synth to be ready to play on beat 1
+  melodyChordNotePart.start();//.loop = "true";
+}
+
+
+function createMelodyChordPattern(scaleNoteDegree) {
+
+  relativeKeyNotes = getSelectedNotes(scaleNotes.map(item => item[0]), keyOctaveNum, scaleNoteDegree, majorScaleNumbers);
+
+  chordNotes = constructChords(relativeKeyNotes);
+
+  // update with more randomness in rhythm and phrasing of chords
+
+  return [["0:0", chordNotes[0]], ["0:2", chordNotes[3]], ["0:4:0", chordNotes[4]], ["0:6:0", chordNotes[0]]];
+          
 
 }
 
@@ -561,6 +666,8 @@ document.getElementById("play-button").addEventListener("click", function() {
         //createPart();
         repeatId = Tone.Transport.scheduleRepeat((time) => {
 
+          console.debug("Called scheduleRepeat anony func, time: " + time); 
+
           Tone.Transport.bpm.value = bpm;
 
           // Part for reference note
@@ -589,15 +696,52 @@ document.getElementById("play-button").addEventListener("click", function() {
   
   });
   
-document.getElementById("shuffle-button").addEventListener("click", function() {
-  // if (synthPart !== undefined) {
-  //   synthPart.dispose();
-  // }
-  // partNotes = [[0, "C6"], ["0:2", "C8"], ["0:3:2", "G8"]];
-  // createPart();
+document.getElementById("melody-button").addEventListener("click", function() {
 
-  synthPart.at("+0", "C#5");
-  //synthPart.start();
+////// TODO... will need to update the structure here so there a toggle for which game playing?  and then possibly just have one button grayed out when active
+if (Tone.Transport.state !== 'started') {
+
+  //createSequence();
+  //createPart();
+  repeatId = Tone.Transport.scheduleRepeat((time) => {
+
+    Tone.Transport.bpm.value = bpm;
+
+    melodyNotePartFunction(time);
+
+    melodyChordNotePartFunction(time)
+
+  }, "4m");
+
+Tone.Transport.start();
+
+} else {
+  // refNoteSynth.volume.value = -100;
+  currentMeasure = 1;
+  // refNoteSynth.releaseAll();
+  // refNoteSynth.dispose();
+  createRefNoteSynth();
+  Tone.Transport.cancel(repeatId);
+  Tone.Transport.stop();
+}
+
+ // TODO:
+ 
+ // Need to add option to select how often to return to "base" melody
+ // Need option to say how many notes shold be selected
+ // At first, can start in C and then just pick those notes that are selected ... if respect base, then select from pool of selected how many notes
+ //   Need function to create part from this...
+ // Need option to random to select the next chord change (respect "return to base" number... note... this count likely shold be started over each time stopped)
+ // Need function that will calculate what the existing notes are as solfege notes for given keys
+ // Later down the road... need option to update what the default/base note situation is
+ // Need to shut off the ref-note if it's playing already
+
 
 });
   
+
+ // Create option that can select how many notes to play at the same time...  I would think just starting with one chord... but maybe have option of chord progression over chord progression?
+
+ // Would be nice to choose more how the key center is establish... especially if there could be one note cloud version...
+
+ // Would be nice to add pitch recognition to allow singing the same melody over different keys...

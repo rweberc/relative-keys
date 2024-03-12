@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relative Tones Practice</title>
+    <title>Simple Piano Keyboard</title>
     <style>
         .piano {
             display: flex;
@@ -74,26 +74,26 @@
 <script>
     function toggleNote(index, keyElement) {
         // console.log('Playing note:', note);
-        global_scaleNotes[index][4] = !global_scaleNotes[index][4];
+        scaleNotes[index][4] = !scaleNotes[index][4];
 
         // Toggle the active class to change the color of the clicked key
         keyElement.classList.toggle('active');
     }
 
     function updateRefNote(selectElement) {
-        global_refNote = selectElement.value + '3'; // later, add option to randomize selection of octave
+        refNote = selectElement.value + '3'; // later, add option to randomize selection of octave
     }
 
     function updateBPM(sliderElement) {
-        global_bpm = sliderElement.value;
+        bpm = sliderElement.value;
     }
 
 </script>
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js></script>
 
-<script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
+<script src=https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js></script>
 
 </br>
 
@@ -112,7 +112,7 @@
 
 <p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p>
 
-<label for="re-base-input">Number of Rounds Before Returning to Reference Key Center:</label>
+<label for="re-base-input">Number of Rounds Before Returning to Initial:</label>
 <select id="re-base-input">
     <!-- <option value="0">N/A</option> -->
     <option value="1">1</option>
@@ -122,28 +122,32 @@
     <option value="5">5</option>
 </select>
 
-<label for="num-base-returns-input">Re-Randomize Melody On Which Return to Reference Key Center:</label>
-<select id="num-base-returns-input">
-    <option value="1">1st</option>
-    <option value="2" selected>2nd</option>
-    <option value="3">3rd</option>
-    <option value="4">4th</option>
-</select>
-
-<label for="num-notes-seq-input">Number of Notes in Melody:</label>
-<select id="num-notes-seq-input">
-    <!-- <option value="0">N/A</option> -->
-    <option value="1">1</option>
-    <option value="2" selected>2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-</select>
-
-<script src="music.js"></script>
+<script src="create.js"></script>
 <script>
-    function refsynthvol(t) { global_solfegeSynth.volume.value = t.value;}
-    function ressynthvol(t) { global_resolutionSynth.volume.value = t.value;}
-    function chordsynthvol(t) { global_keySynth.volume.value = t.value;}
+    function refsynthvol(t) { refNoteSynth.volume.value = t.value;}
+    function ressynthvol(t) { resSynth.volume.value = t.value;}
+    function chordsynthvol(t) { chordSynth.volume.value = t.value;}
+    function test_fn(t) {
+
+        filter.frequency.value = t.value;
+        // //refNoteSynth.volume.value = parseInt(t.value);
+        // //refNoteSynth.oscillator.type = "sine";
+        // refNoteSynth.set({
+        // harmonicity: t.value,
+        // //detune: t.value,
+        // // envelope: {
+        // //     attack: 0.01,
+        // // },
+        // oscillator: {
+        //     type: "square"
+        // }
+        // filter: {
+        //     Q: t.value
+        // }
+        // });
+
+    }
+
 
 </script>
 
