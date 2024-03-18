@@ -112,25 +112,45 @@
 
 <p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p>
 
-<label for="re-base-input">Number of Rounds Before Returning to Reference Key Center:</label>
-<select id="re-base-input">
-    <!-- <option value="0">N/A</option> -->
+<p>Melody Note Duration <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);"></p>
+
+
+<!-- <p><label for="mel-duration-slider">Duration:</label>
+    <select id="mel-duration-slider" oninput="melduration(this)">
+        <option value="2n" selected>2</option>
+        <option value="4n">4</option>
+        <option value="5n">8</option>
+    </select></p> -->
+
+
+<p><label for="scenario-input">Repeat Each Scenario This many Times:</label>
+    <select id="scenario-input" onchange="changeScenarioRounds(this);">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select></p>
+
+<p><label for="re-base-input">Number of Rounds Before Returning to Reference Key Center:</label>
+<select id="re-base-input" onchange="changeInitialStateRounds(this);">
     <option value="1">1</option>
     <option value="2" selected>2</option>
     <option value="3">3</option>
     <option value="4">4</option>
     <option value="5">5</option>
-</select>
+</select></p>
 
-<label for="num-base-returns-input">Re-Randomize Melody On Which Return to Reference Key Center:</label>
-<select id="num-base-returns-input">
+<p><label for="num-base-returns-input">Re-Randomize Melody After Playing Reference Key Center This Many Times:</label>
+<select id="num-base-returns-input" onchange="changeMelodyRounds(this);">
     <option value="1">1st</option>
     <option value="2" selected>2nd</option>
     <option value="3">3rd</option>
     <option value="4">4th</option>
-</select>
+</select></p>
 
-<label for="num-notes-seq-input">Number of Notes in Melody:</label>
+
+<p><label for="num-notes-seq-input">Number of Notes in Melody:</label>
 <select id="num-notes-seq-input">
     <!-- <option value="0">N/A</option> -->
     <option value="1">1</option>
@@ -138,13 +158,19 @@
     <option value="3">3</option>
     <option value="4">4</option>
 </select>
+</p>
 
 <script src="music.js"></script>
 <script>
     function refsynthvol(t) { global_solfegeSynth.volume.value = t.value;}
-    function ressynthvol(t) { global_resolutionSynth.volume.value = t.value;}
-    function chordsynthvol(t) { global_keySynth.volume.value = t.value;}
+    function melduration(t) { global_melodyNoteDuration = t.value/100.0;}
 
+    function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
+
+    function chordsynthvol(t) { global_keySynth.volume.value = t.value;}
+    function changeScenarioRounds(t) { global_scenarioRepeats = t.value;}
+    function changeMelodyRounds(t) { global_totalRoundsToRandomizeMelody = t.value;}
+    function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
 </script>
 
 </html>

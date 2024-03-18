@@ -29,21 +29,25 @@ let global_currentKey;
 
 let global_currentMelodyNotes = [];
 
-let global_scenarioRepeats = 2;
+let global_scenarioRepeats = document.getElementById('scenario-input').value;
 
 let global_scenarioRepeatsCount = 1;
 
 let global_barCount = 1;
 
-let global_roundsToInitialState = 4;
+let global_roundsToInitialState = document.getElementById('re-base-input').value;
 
 let global_roundsToInitialStateCount = 1;
 
-let global_totalRoundsToRandomizeMelody = 1;
+let global_totalRoundsToRandomizeMelody = document.getElementById('num-base-returns-input').value;
 
 let global_totalRoundsToRandomizeMelodyCount = 1
 
-let global_currentSolfege;
+let global_melodyNoteDuration = document.getElementById('mel-duration-slider').value;
+
+let global_currentSolfege; // Even though this is call "currentSolfege"... the values are the letter (C, D, E, etc.) values associated with a root of C solfege notes.  This needs to be updated to be more straight-forward.
+
+let global_currentSolfegeActuallySolfege;
 
 let global_transportPlayId;
 
@@ -153,7 +157,7 @@ document.getElementById("melody-button").addEventListener("click", async functio
 
         // createKeyPart randomizes the key... then the melody is created...
         createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
-        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_cadenceMeasureLength));
+        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum));
 
       }, global_cadenceMeasureLength);
 
@@ -177,14 +181,13 @@ document.getElementById("melody-button").addEventListener("click", async functio
 
 function createSolfegePart(time, pattern_function) {
 
-    // TODO: other games... createSolfegePattern_staticSolfege(), createSolfegePattern_changingModes()
     if (global_solfegePart !== undefined) {
         global_solfegePart.dispose();
     }
   
     global_solfegePart = new Tone.Part(
       function(time, event) {
-        global_solfegeSynth.triggerAttackRelease(event.note, event.duration, time); //note, "10hz", time);
+        global_solfegeSynth.triggerAttackRelease(event.note, global_melodyNoteDuration, time); //note, event.duration, time);
       },
       pattern_function
     );
@@ -195,7 +198,6 @@ function createSolfegePart(time, pattern_function) {
 
 function createKeyPart(time, pattern_function) {
 
-    // TODO: other games: createSolfegePattern_staticSolfege(), createSolfegePattern_changingModes()
     if (global_keyPart !== undefined) {
         global_keyPart.dispose();
     }
@@ -295,6 +297,7 @@ function createResolutionPattern(currentKeyNotes, refNote, keyOctaveNum) {
   const secondsPerBeat = 60.0 / Tone.Transport.bpm.value;
   const secondsPerHalfMeasure = secondsPerBeat * 2;
 
+  
   let refNoteIndex = removeNumber(currentKeyNotes).indexOf(removeNumber(refNote));
 
   let addRefNote = false;
@@ -345,51 +348,74 @@ function createResolutionPattern(currentKeyNotes, refNote, keyOctaveNum) {
 
   }
   
-  resolutionPart = resolutionNotes.map((value, index) => {
-      const calculatedValue = (secondsPerHalfMeasure * 6) + secondsPerHalfMeasure/currentKeyNotes.length * index;
-      return {time: calculatedValue, duration: "10hz", note: value};
-  });
+  // resolutionPart = resolutionNotes.map((value, index) => {
+  //     const calculatedValue = (secondsPerHalfMeasure * 6) + secondsPerHalfMeasure/resolutionNotes.length * index;
+  //     return {time: calculatedValue, duration: "10hz", note: value};
+  // });
+
+  // resolutionPart = createNoteSequence(.5, Tone.Transport.timeSignature, resolutionNotes, "3:0:0", Tone.Transport.bpm.value);
+
+  resolutionPart = createNoteSequence_seconds(.5, Tone.Transport.timeSignature, resolutionNotes, 3, Tone.Transport.bpm.value);
 
   return resolutionPart;
 
 }
 
 
-function createSolfegePattern_staticSolfege(refNote, cadenceMeasureLength) {
+function createSolfegePattern_staticSolfege(refNote, keyOctaveNum) {
+
+  //console.debug("createSolfegePattern_staticSolfege, global_scenarioRepeatsCount: " + global_scenarioRepeatsCount); 
 
   // if first time through a scnenario, converts the solfege to melody notes for the current key
-  if (global_scenarioRepeatsCount - 1 == 1) { // -1 Because count is advanced in the createKeyPattern_changingSolfege function called just prior
+  if (global_scenarioRepeatsCount - 1 <= 1) { // -1 Because count is advanced in the createKeyPattern_changingSolfege function called just prior
 
-// TODO: check that this doesn't need to be updated for the multi-dimensional array...)
+  // TODO: check that this doesn't need to be updated for the multi-dimensional array...)
+    console.debug("global_currentKey: " + global_currentKey); 
 
     // take global_currentSolfege and use global_scaleNotes to get the indexes in an array... store in currentMelodyIndexes
-    let currentMelodyIndexes = global_currentSolfege.map(note => global_scaleNotes.map(item => item[0]).indexOf(note)); 
-
+   
     // take global_scaleNotes... order with root being current key... store in reorderedScaleNotes
     let rootIndex = global_scaleNotes.map(item => item[0]).indexOf(global_currentKey);
     let reorderedScaleNotes = [...global_scaleNotes.slice(rootIndex), ...global_scaleNotes.slice(0, rootIndex)];
 
+    // update the associated solfege notes
+    //reorderedScaleNotes = [reorderedScaleNotes.map(item => item[0]), global_scaleNotes.map(item => item[1])];
+    reorderedScaleNotes = reorderedScaleNotes.map((item, index) => { return {note: item[0], solfege: global_scaleNotes[index][1]}});
+
+    let cIndex = reorderedScaleNotes.findIndex(item => item["note"] === 'C');
+
+    reorderedScaleNotes = reorderedScaleNotes.map((item, index) => {
+      
+      let newOctave = index < cIndex | cIndex == 0 ? keyOctaveNum : keyOctaveNum + 1;
+      return {...item, octave: newOctave};
+    });
+
     // then use currentMelodyIndexes to get the notes from reorderedScaleNotes... store in global_currentMelodyNotes
-    global_currentMelodyNotes = currentMelodyIndexes.map(index => reorderedScaleNotes[index]);
+    global_currentMelodyNotes = global_currentSolfegeActuallySolfege.map(solfege => { // TODO: there got to be a simpler syntax that can replace this
+      // let index = reorderedScaleNotes["solfege"].indexOf(solfege);
+      // let note = reorderedScaleNotes["note"][index] + reorderedScaleNotes["octave"][index];
+
+      let note = reorderedScaleNotes.find(item => item.solfege === solfege).note + reorderedScaleNotes.find(item => item.solfege === solfege).octave;
+      return {note, solfege};
+    });
+    
+    console.debug(global_currentMelodyNotes);
 
   }
-  return [{time: "0:0", duration: "4m", note: "A4"}];
-  // // TODO: update format here... and also make the note spacing dynamically calculated like in createResolutionPattern
-  // return [["2:0", melodyNotes[0] + keyOctaveNum], 
-  //         ["2:2", melodyNotes[1] + keyOctaveNum], 
-  //         ["2:4", melodyNotes[2] + keyOctaveNum], 
-  //         ["2:6", melodyNotes[3] + keyOctaveNum]]; // update to be the several notes...
+  //return [{time: "0:0", duration: "4m", note: "A4"}];
 
-  // return [{time: "0:0", duration: cadenceMeasureLength, note: refNote}];
-
+  let staticSolfegePart = createNoteSequence_seconds(.7, Tone.Transport.timeSignature, global_currentMelodyNotes.map(item => item["note"]), 2.75, Tone.Transport.bpm.value);
   // TODO: finally... update how the solfege notes are displayed on the screen...
 
+  return staticSolfegePart
 }
 
 
 function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
 
-  //let contextKey;
+  console.debug("global_totalRoundsToRandomizeMelodyCount: " + global_totalRoundsToRandomizeMelodyCount); 
+  console.debug("global_roundsToInitialStateCount: " + global_roundsToInitialStateCount); 
+  console.debug("global_scenarioRepeatsCount: " + global_scenarioRepeatsCount); 
 
   if (global_scenarioRepeatsCount == 1) {
 
@@ -401,7 +427,20 @@ function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
         let melodyNoteCount = document.getElementById('num-notes-seq-input').value;
      
         /// Could do this in solfegePattern part too... but  maybe a bit more straight-forward to have all this logic in one place
-        global_currentSolfege = getRandomElements(possibleMelodyNotes, melodyNoteCount); // TODO: this call would be updated to support chords
+        global_currentSolfegeActuallySolfege = getRandomElements(possibleMelodyNotes, melodyNoteCount).map(letter => {
+          // Find the index of the letter in the first elements of global_scaleNotes
+          let index = global_scaleNotes.findIndex(item => item[0] === letter);
+        
+          // If the letter was found, return the corresponding solfege value
+          // If the letter was not found, return the original letter
+          return index !== -1 ? global_scaleNotes[index][1] : letter;
+        });
+        // TODO: this call would be updated to support chords
+        // TODO: also could update this to add an octave argument
+
+        document.getElementById('current-note').textContent = "Current solfege note: " + global_currentSolfegeActuallySolfege.join(', ');
+
+        console.debug("Current solfege note: " + global_currentSolfegeActuallySolfege.join(', '));
 
       }
 
@@ -426,7 +465,7 @@ function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
 
   global_scenarioRepeatsCount = (global_scenarioRepeatsCount % global_scenarioRepeats) + 1;
 
-  
+
   return createKeyPattern(global_currentKey, keyOctaveNum)
 
 
@@ -652,27 +691,54 @@ function constructChords(scale) {
 // Section: Sequence Utilities
 // ===========================
 
-function createNoteSequence(numMeasures, timeSignature, notes) {
-  // Calculate the total number of beats
-  let totalBeats = numMeasures * timeSignature;
+function createNoteSequence_seconds(numMeasures, timeSignature, notes, initialOffsetMeasures, bpm) {
 
-  // Calculate the duration of each note in beats
-  let beatsPerNote = totalBeats / notes.length;
+  const secondsPerBeat = 60.0 / bpm;
+  // const secondsPerHalfMeasure = secondsPerBeat * 2;
+  const initialOffsetMeasuresInSeconds = initialOffsetMeasures * secondsPerBeat * timeSignature;
+  const totalMeasureLengthInSeconds = numMeasures * secondsPerBeat * timeSignature;
 
-  // Calculate the duration of each note as half the length between each note and the next
-  let noteDuration = beatsPerNote / 2;
+  return notes.map((value, index) => {
+    const calculatedValue = initialOffsetMeasuresInSeconds + totalMeasureLengthInSeconds/notes.length * index;
+    return {time: calculatedValue, duration: "10hz", note: value};
+});
 
-  // Create the note sequence
-  let noteSequence = notes.map((note, index) => {
-    return {
-      time: `${Math.floor(index * beatsPerNote)}:${Math.floor((index * beatsPerNote) % 1 * 4)}:0`,
-      note: note,
-      duration: `${Math.floor(noteDuration)}:${Math.floor((noteDuration) % 1 * 4)}:0`
-    };
-  });
+  // resolutionPart = resolutionNotes.map((value, index) => {
+  //     const calculatedValue = (secondsPerHalfMeasure * 6) + secondsPerHalfMeasure/resolutionNotes.length * index;
+  //     return {time: calculatedValue, duration: "10hz", note: value};
+  // });
 
-  return noteSequence;
 }
+
+// function createNoteSequence_beats(numMeasures, timeSignature, notes, initialOffset, tempo) {
+//   // Calculate the total number of beats
+//   let totalBeats = numMeasures * (timeSignature / 4);
+
+//   // Calculate the duration of each note in beats
+//   let beatsPerNote = totalBeats / notes.length;
+
+//   // Calculate the duration of each note in Hz (1 / duration in seconds)
+//   let noteDurationHz = 1 / (beatsPerNote / 2);
+
+//   // Split the initial offset into its components and convert to beats
+//   let [offsetMeasures, offsetBeats, offsetSixteenths] = initialOffset.split(':').map(Number);
+//   let totalOffsetBeats = offsetMeasures * (timeSignature / 4) + offsetBeats + offsetSixteenths / 4;
+
+//   // Convert beats to seconds (60 seconds per minute / tempo in beats per minute)
+//   let beatDurationSeconds = 60 / tempo;
+
+//   // Create the note sequence
+//   let noteSequence = notes.map((note, index) => {
+//     let noteTime = (index * beatsPerNote + totalOffsetBeats) * beatDurationSeconds;
+//     return {
+//       time: noteTime,
+//       note: note,
+//       duration: noteDurationHz
+//     };
+//   });
+
+//   return noteSequence;
+// }
 
 
 
@@ -685,6 +751,15 @@ function removeNumber(str) {
   
   if (Array.isArray(str)) {
     return str.map((s) => s.replace(/[0-9]/g, ''));
+  } else {
+    return str.replace(/[0-9]/g, '');
+  }
+}
+
+function removeLetter(str) {
+  
+  if (Array.isArray(str)) {
+    return str.map((s) => s.replace(/[a-zA-Z]/g, ''));
   } else {
     return str.replace(/[0-9]/g, '');
   }
@@ -705,5 +780,8 @@ function getRandomElements(arr, count) {
   for(let i = 0; i < count; i++) {
       result.push(arr[Math.floor(Math.random() * arr.length)]);
   }
+  
+  console.debug("random function: " + result);
+
   return result;
 }
