@@ -36,7 +36,7 @@
 <body>
     <label for="musical-notes">Select a reference note:</label>
     <select id="ref-note" name="ref-note" onchange="updateRefNote(this)">
-        <option value="C">C</option>
+        <option value="C" selected>C</option>
         <option value="C#">C#</option>
         <option value="D">D</option>
         <option value="D#">D#</option>
@@ -52,7 +52,7 @@
     <br>
     <br>
     <label for="tempo-slider">Adjust tempo:</label>
-    <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="120" onchange="updateBPM(this)">
+    <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
     <br>
     <br>
     <div class="piano">

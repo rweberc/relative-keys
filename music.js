@@ -21,89 +21,135 @@ let global_scaleNotes = [['C', 'do', 'doe', '1', 0],
 // example of how to call column [2] and row [3]scaleNotes.map(item => item[2])[3]
 // has to be an easier way to select several items at once... [2, 3, 4, 7].map(ind => scaleNotes.map(item => item[2])[ind])
 
-let global_majorScaleNumbers = [0, 2, 4, 5, 7, 9, 11];
+let global_majorScaleNumbers = [0, 2, 4, 5, 7, 9, 11]; // TODO: update to constant
 
-let global_currentKeyNotes = [];
-
-let global_currentKey;
-
-let global_currentMelodyNotes = [];
-
-let global_scenarioRepeats = document.getElementById('scenario-input').value;
-
-let global_scenarioRepeatsCount = 1;
-
-let global_barCount = 1;
-
-let global_roundsToInitialState = document.getElementById('re-base-input').value;
-
-let global_roundsToInitialStateCount = 1;
-
-let global_totalRoundsToRandomizeMelody = document.getElementById('num-base-returns-input').value;
-
-let global_totalRoundsToRandomizeMelodyCount = 1
-
-let global_melodyNoteDuration = document.getElementById('mel-duration-slider').value;
-
-let global_currentSolfege; // Even though this is call "currentSolfege"... the values are the letter (C, D, E, etc.) values associated with a root of C solfege notes.  This needs to be updated to be more straight-forward.
-
-let global_currentSolfegeActuallySolfege;
-
-let global_transportPlayId;
-
-// Number of measures for loop
-let global_cadenceMeasureLength = "4m";
-
-let global_advanceKeys = true;
-
-let global_playResolution = true;
-
-let global_keyOctaveNum = 4;
-
-// Synths
-let global_solfegeSynth;
 let global_keySynth;
+let global_solfegeSynth;
 let global_resolutionSynth;
 
-// create a new sequence with the synth and notes
-let global_solfegePart;
-let global_keyPart;
-let global_resolutionPart;
-
-let global_refNote = "C4";
-let global_chordNotes = [["C3", "E3", "G3"], ["F3", "A3", "C4"], ["G3", "B3", "D4"], ["C3", "E3", "G3"]];
-let global_bpm = 220;
-
-// Synth declarations
 let global_filter;
 let global_chord_filter;
-
-// Effects
 let global_reverb;
 let global_pingPong;
 
-createKeySynth(); // Eventually, move into initialize() function
-createResolutionSynth();
-createSolfegeSynth();
+let global_keyPart;
+let global_solfegePart;
+let global_resolutionPart;
+
+let global_refNote;
+let global_bpm;
+let global_transportPlayId;
+
+let global_scenarioRepeats;
+let global_scenarioRepeatsCount;
+let global_roundsToInitialState;
+let global_roundsToInitialStateCount;
+let global_totalRoundsToRandomizeMelody;
+let global_totalRoundsToRandomizeMelodyCount;
+let global_cadenceMeasureLength;
+
+let global_currentKeyNotes;
+let global_currentKey;
+let global_currentMelodyNotes;
+let global_melodyNoteDuration;
+let global_currentSolfegeWRT_C;
+let global_currentSolfegeWRT_DO;
+
+
+
+
+// let global_currentKeyNotes = [];
+
+// let global_currentKey;
+
+// let global_currentMelodyNotes = [];
+
+// let global_scenarioRepeats = document.getElementById('scenario-input').value;
+
+// let global_scenarioRepeatsCount = 1;
+
+// // let global_barCount = 1;
+
+// let global_roundsToInitialState = document.getElementById('re-base-input').value;
+
+// let global_roundsToInitialStateCount = 1;
+
+// let global_totalRoundsToRandomizeMelody = document.getElementById('num-base-returns-input').value;
+
+// let global_totalRoundsToRandomizeMelodyCount = 1
+
+// let global_melodyNoteDuration = document.getElementById('mel-duration-slider').value/100.0;
+
+// let global_currentSolfegeWRT_C; // Even though this is call "currentSolfege"... the values are the letter (C, D, E, etc.) values associated with a root of C solfege notes.  This needs to be updated to be more straight-forward.
+
+// let global_currentSolfegeWRT_DO;
+
+// let global_transportPlayId;
+
+// // Number of measures for loop
+// let global_cadenceMeasureLength = "4m";
+
+// let global_playResolution = true;
+
+// let global_keyOctaveNum = 4;
+
+// // Synths
+// let global_solfegeSynth;
+// let global_keySynth;
+// let global_resolutionSynth;
+
+// // create a new sequence with the synth and notes
+// let global_solfegePart;
+// let global_keyPart;
+// let global_resolutionPart;
+
+// let global_refNote = "C4";
+// // let global_chordNotes = [["C3", "E3", "G3"], ["F3", "A3", "C4"], ["G3", "B3", "D4"], ["C3", "E3", "G3"]];
+// let global_bpm = 220;
+
+// // Synth declarations
+// let global_filter;
+// let global_chord_filter;
+
+// // Effects
+// let global_reverb;
+// let global_pingPong;
+
+initializePlayer();
+
 
 function initializePlayer() {
 
-    // initialize the transport
-    // Tone.Transport.bpm.value = global_bpm;
-    // Tone.Transport.loop = true;
-    // Tone.Transport.loopStart = 0;
-    // Tone.Transport.loopEnd = global_cadenceMeasureLength;
-    // Tone.Transport.swing = 0;
-    // Tone.Transport.swingSubdivision = "8n";
-    // Tone.Transport.timeSignature = [4, 4];
+  createKeySynth(); // Eventually, move into initialize() function
+  createResolutionSynth();
+  createSolfegeSynth();
+
+  global_bpm = document.getElementById("tempo-slider").value;
+
+  // initialize the transport
+  Tone.Transport.bpm.value = global_bpm;
+  // Tone.Transport.loop = true;
+  // Tone.Transport.loopStart = 0;
+  // Tone.Transport.loopEnd = global_cadenceMeasureLength;
+  // Tone.Transport.swing = 0;
+  // Tone.Transport.swingSubdivision = "8n";
+  // Tone.Transport.timeSignature = [4, 4];
 
 
-    // TODO: update to set values from the interface
-    //      including like values for global_currentSolfege... global_scenarioRepeats, global_roundsToInitialState, global_cadenceMeasureLength, global_advanceKeys, global_playResolution, global_keyOctaveNum, global_bpm
-    //      including: global_totalRoundsToRandomizeMelody, global_totalRoundsToRandomizeMelodyCount = 1
-    global_scenarioRepeatsCount = 1;
-    global_barCount = 1;
-    global_roundsToInitialStateCount = 1;
+  // TODO: update to set values from the interface
+  //      including like values for global_currentSolfege... global_scenarioRepeats, global_roundsToInitialState, global_cadenceMeasureLength, global_playResolution, global_keyOctaveNum, global_bpm
+  //      including: global_totalRoundsToRandomizeMelody, global_totalRoundsToRandomizeMelodyCount = 1
+  global_scenarioRepeats = document.getElementById('scenario-input').value;
+  global_scenarioRepeatsCount = 1;
+  global_roundsToInitialState = document.getElementById('re-base-input').value;
+  global_roundsToInitialStateCount = 1;
+  global_totalRoundsToRandomizeMelody = document.getElementById('num-base-returns-input').value;
+  global_totalRoundsToRandomizeMelodyCount = 1
+  global_melodyNoteDuration = document.getElementById('mel-duration-slider').value/100.0;
+  global_cadenceMeasureLength = "4m";
+  global_playResolution = true;
+  global_keyOctaveNum = 4;
+  global_refNote = document.getElementById('ref-note').value;
 
 }
 
@@ -134,7 +180,6 @@ document.getElementById("play-button").addEventListener("click", async function(
   
     } else {
 
-        createSolfegeSynth();
         initializePlayer();
 
         Tone.Transport.cancel(global_transportPlayId);
@@ -157,7 +202,7 @@ document.getElementById("melody-button").addEventListener("click", async functio
 
         // createKeyPart randomizes the key... then the melody is created...
         createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
-        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum));
+        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
 
       }, global_cadenceMeasureLength);
 
@@ -166,7 +211,6 @@ document.getElementById("melody-button").addEventListener("click", async functio
 
   } else {
 
-      createSolfegeSynth();
       initializePlayer();
 
       Tone.Transport.cancel(global_transportPlayId);
@@ -187,7 +231,7 @@ function createSolfegePart(time, pattern_function) {
   
     global_solfegePart = new Tone.Part(
       function(time, event) {
-        global_solfegeSynth.triggerAttackRelease(event.note, global_melodyNoteDuration, time); //note, event.duration, time);
+        global_solfegeSynth.triggerAttackRelease(event.note, event.duration, time); //note, , time);
       },
       pattern_function
     );
@@ -238,7 +282,7 @@ function createResolutionPart(time, pattern_function) {
 
 function createSolfegePattern_changingSolfege(refNote, cadenceMeasureLength) {
 
-  return [{time: "0:0", duration: cadenceMeasureLength, note: refNote}];
+  return [{time: "0:0", duration: cadenceMeasureLength, note: refNote + "4"}]; // TODO: add in an octave option here for refNote?
 
 }
 
@@ -249,7 +293,7 @@ function createKeyPattern_changingSolfege(refNote, keyOctaveNum) {
 
     // deciding on the key advance here should be moved
     if (global_scenarioRepeatsCount == 1) {
-        global_currentSolfege = randomizeScaleDegree(global_scaleNotes); // should remove current scaleNoteDegree from options
+        global_currentSolfegeWRT_C = randomizeScaleDegree(global_scaleNotes); // should remove current scaleNoteDegree from options
         console.debug(global_scenarioRepeatsCount); 
         global_scenarioRepeatsCount += 1;
     } else if (global_scenarioRepeatsCount <= global_scenarioRepeats - 1) {
@@ -261,7 +305,7 @@ function createKeyPattern_changingSolfege(refNote, keyOctaveNum) {
         global_scenarioRepeatsCount = 1;
     }
 
-    let contextKey = getContextScale(refNote, global_currentSolfege);
+    let contextKey = getContextScale(refNote, global_currentSolfegeWRT_C);
 
     return createKeyPattern(contextKey, keyOctaveNum)
 }
@@ -284,6 +328,7 @@ function createKeyPattern(contextKey, keyOctaveNum) {
 
     // let chordNotes = i_iv_v_progression.map(chord => appendNumber(Tonal.Chord.notes(chord), keyOctaveNum));
 
+    // TODO: figure out if "10hz" is really functioning here at all
     return [{time: "0:0", duration: "10hz", note: chordNotes[0]}, 
             {time: "0:2", duration: "10hz", note: chordNotes[3]}, 
             {time: "0:4:0", duration: "10hz", note: chordNotes[4]}, 
@@ -355,14 +400,14 @@ function createResolutionPattern(currentKeyNotes, refNote, keyOctaveNum) {
 
   // resolutionPart = createNoteSequence(.5, Tone.Transport.timeSignature, resolutionNotes, "3:0:0", Tone.Transport.bpm.value);
 
-  resolutionPart = createNoteSequence_seconds(.5, Tone.Transport.timeSignature, resolutionNotes, 3, Tone.Transport.bpm.value);
+  resolutionPart = createNoteSequence_seconds(.5, Tone.Transport.timeSignature, resolutionNotes, 3, Tone.Transport.bpm.value, "10hz");
 
   return resolutionPart;
 
 }
 
 
-function createSolfegePattern_staticSolfege(refNote, keyOctaveNum) {
+function createSolfegePattern_staticSolfege(refNote, keyOctaveNum, note_duration) {
 
   //console.debug("createSolfegePattern_staticSolfege, global_scenarioRepeatsCount: " + global_scenarioRepeatsCount); 
 
@@ -391,7 +436,7 @@ function createSolfegePattern_staticSolfege(refNote, keyOctaveNum) {
     });
 
     // then use currentMelodyIndexes to get the notes from reorderedScaleNotes... store in global_currentMelodyNotes
-    global_currentMelodyNotes = global_currentSolfegeActuallySolfege.map(solfege => { // TODO: there got to be a simpler syntax that can replace this
+    global_currentMelodyNotes = global_currentSolfegeWRT_DO.map(solfege => { // TODO: there got to be a simpler syntax that can replace this
       // let index = reorderedScaleNotes["solfege"].indexOf(solfege);
       // let note = reorderedScaleNotes["note"][index] + reorderedScaleNotes["octave"][index];
 
@@ -404,7 +449,7 @@ function createSolfegePattern_staticSolfege(refNote, keyOctaveNum) {
   }
   //return [{time: "0:0", duration: "4m", note: "A4"}];
 
-  let staticSolfegePart = createNoteSequence_seconds(.7, Tone.Transport.timeSignature, global_currentMelodyNotes.map(item => item["note"]), 2.75, Tone.Transport.bpm.value);
+  let staticSolfegePart = createNoteSequence_seconds(.7, Tone.Transport.timeSignature, global_currentMelodyNotes.map(item => item["note"]), 2.75, Tone.Transport.bpm.value, note_duration);
   // TODO: finally... update how the solfege notes are displayed on the screen...
 
   return staticSolfegePart
@@ -427,7 +472,7 @@ function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
         let melodyNoteCount = document.getElementById('num-notes-seq-input').value;
      
         /// Could do this in solfegePattern part too... but  maybe a bit more straight-forward to have all this logic in one place
-        global_currentSolfegeActuallySolfege = getRandomElements(possibleMelodyNotes, melodyNoteCount).map(letter => {
+        global_currentSolfegeWRT_DO = getRandomElements(possibleMelodyNotes, melodyNoteCount).map(letter => {
           // Find the index of the letter in the first elements of global_scaleNotes
           let index = global_scaleNotes.findIndex(item => item[0] === letter);
         
@@ -438,9 +483,9 @@ function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
         // TODO: this call would be updated to support chords
         // TODO: also could update this to add an octave argument
 
-        document.getElementById('current-note').textContent = "Current solfege note: " + global_currentSolfegeActuallySolfege.join(', ');
+        document.getElementById('current-note').textContent = "Current solfege note: " + global_currentSolfegeWRT_DO.join(', ');
 
-        console.debug("Current solfege note: " + global_currentSolfegeActuallySolfege.join(', '));
+        console.debug("Current solfege note: " + global_currentSolfegeWRT_DO.join(', '));
 
       }
 
@@ -572,10 +617,10 @@ function randomizeScaleDegree(scaleNotes) {
 
     let scaleDegrees;
     
-    if (global_currentSolfege === undefined | scaleNotes.filter(item => item[4] == true).length == 1)
+    if (global_currentSolfegeWRT_C === undefined | scaleNotes.filter(item => item[4] == true).length == 1)
       scaleDegrees = scaleNotes.filter(item => item[4] == true).map(item => item[0]);
     else 
-      scaleDegrees = scaleNotes.filter(item => item[0] != global_currentSolfege).filter(item => item[4] == true).map(item => item[0]);
+      scaleDegrees = scaleNotes.filter(item => item[0] != global_currentSolfegeWRT_C).filter(item => item[4] == true).map(item => item[0]);
 
     let newNote = scaleDegrees[Math.floor(Math.random() * scaleDegrees.length)];
 
@@ -592,7 +637,7 @@ function randomizeScaleDegree(scaleNotes) {
 // for instance, if the note is C3 and the scaleDegree is "mi", then the function should return the major key that makes C3 sound like the "mi" of that scale, which is G# Major
 function getContextScale(refNote, currentSolfege) {
 
-  let orderedNotes = getOrderedNotes(global_scaleNotes.map(item => item[0]), removeNumber(refNote));
+  let orderedNotes = getOrderedNotes(global_scaleNotes.map(item => item[0]), removeNumber(refNote)); // TODO: does refNote ever need a number removed?
 
   // get the index of the scaleDegree in the scaleDegrees array
   let scaleDegreeIndex = global_scaleNotes.map(item => item[0]).indexOf(currentSolfege);
@@ -691,7 +736,7 @@ function constructChords(scale) {
 // Section: Sequence Utilities
 // ===========================
 
-function createNoteSequence_seconds(numMeasures, timeSignature, notes, initialOffsetMeasures, bpm) {
+function createNoteSequence_seconds(numMeasures, timeSignature, notes, initialOffsetMeasures, bpm, note_duration) {
 
   const secondsPerBeat = 60.0 / bpm;
   // const secondsPerHalfMeasure = secondsPerBeat * 2;
@@ -700,7 +745,7 @@ function createNoteSequence_seconds(numMeasures, timeSignature, notes, initialOf
 
   return notes.map((value, index) => {
     const calculatedValue = initialOffsetMeasuresInSeconds + totalMeasureLengthInSeconds/notes.length * index;
-    return {time: calculatedValue, duration: "10hz", note: value};
+    return {time: calculatedValue, duration: note_duration, note: value};
 });
 
   // resolutionPart = resolutionNotes.map((value, index) => {
