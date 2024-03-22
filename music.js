@@ -39,6 +39,7 @@ let global_resolutionPart;
 let global_refNote;
 let global_bpm;
 let global_transportPlayId;
+let global_currentGame; // "staticSolfege", "changingSolfege", "modeMelodies"
 
 let global_scenarioRepeats;
 let global_scenarioRepeatsCount;
@@ -124,6 +125,8 @@ function initializePlayer() {
   createResolutionSynth();
   createSolfegeSynth();
 
+  global_currentGame = "";
+
   global_bpm = document.getElementById("tempo-slider").value;
 
   // initialize the transport
@@ -153,6 +156,35 @@ function initializePlayer() {
 
 }
 
+function resetPlayer() {
+
+  Tone.Transport.cancel(); // Seems like overkill... but when using global_transportPlayId, seemed to have some delay on being populated when one game would "interrupt" another, and the previous game wouldn't get properly reset
+  Tone.Transport.stop();
+
+  // Similar to above, these may also be overkill resets... would require more testing scenarios to confirm.
+  global_keySynth.releaseAll();
+  global_solfegeSynth.releaseAll();
+  global_resolutionSynth.releaseAll();
+
+  global_keySynth.dispose();
+  global_solfegeSynth.dispose();
+  global_resolutionSynth.dispose();
+
+  if (global_keyPart !== undefined) {
+    global_keyPart.dispose();
+  }
+
+  if (global_solfegePart !== undefined) {
+    global_solfegePart.dispose();
+  }
+
+  if (global_resolutionPart !== undefined) {
+    global_resolutionPart.dispose();
+  }
+
+  initializePlayer(); // This sets Transport....bpm... does it matter if it is before or after the previous lines of code?
+
+}
 
 // =======================================
 // Section: Main Execution On-Click Events
@@ -160,31 +192,46 @@ function initializePlayer() {
 
 document.getElementById("play-button").addEventListener("click", async function() {
 
-    if (Tone.Transport.state !== 'started') {
+  let playNow = false;
 
-        global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+  if (Tone.Transport.state !== 'started') {
 
-          console.debug("Called scheduleRepeat anony func, time: " + time); 
+    playNow = true;
 
-          Tone.Transport.bpm.value = global_bpm;
+  } else {
 
-          // Part for reference note
-          createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
-          createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
-          createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
+    if (global_currentGame !== "changingSolfege")
+      playNow = true;
 
-        }, global_cadenceMeasureLength);
+    resetPlayer();
 
-      await Tone.start();
-      Tone.Transport.start();
-  
-    } else {
+  }
 
-        initializePlayer();
+  if (playNow) {
 
-        Tone.Transport.cancel(global_transportPlayId);
-        Tone.Transport.stop();
-    }
+    global_currentGame = "changingSolfege";
+
+    global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+
+      console.debug("Called scheduleRepeat anony func, time: " + time); 
+
+      Tone.Transport.bpm.value = global_bpm;
+
+      // Part for reference note
+      createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
+      createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
+      createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
+
+    }, global_cadenceMeasureLength);
+
+    await Tone.start();
+    Tone.Transport.start();
+
+  } //else {
+
+  //   resetPlayer();
+
+  // }
 });
 
 
@@ -192,30 +239,44 @@ document.getElementById("play-button").addEventListener("click", async function(
 // TODO: need make this button stop other buttons progress if currently playing.  Right now, just re-using the same global_transportPlayId
 document.getElementById("melody-button").addEventListener("click", async function() {
 
+  let playNow = false;
+
   if (Tone.Transport.state !== 'started') {
 
-      global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+    playNow = true;
 
-        console.debug("Called scheduleRepeat anony func, time: " + time); 
+  } else {
 
-        Tone.Transport.bpm.value = global_bpm;
+    if (global_currentGame !== "staticSolfege")
+      playNow = true;
 
-        // createKeyPart randomizes the key... then the melody is created...
-        createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
-        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
+    resetPlayer();
 
-      }, global_cadenceMeasureLength);
+  }
+
+  if (playNow) {
+
+    global_currentGame = "staticSolfege";
+
+    global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+
+      console.debug("Called scheduleRepeat anony func, time: " + time); 
+
+      Tone.Transport.bpm.value = global_bpm;
+
+      // createKeyPart randomizes the key... then the melody is created...
+      createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
+      createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
+
+    }, global_cadenceMeasureLength);
 
     await Tone.start();
     Tone.Transport.start();
 
-  } else {
+  } //else {
 
-      initializePlayer();
-
-      Tone.Transport.cancel(global_transportPlayId);
-      Tone.Transport.stop();
-  }
+  //   resetPlayer();
+  // }
 });
 
 
@@ -534,6 +595,8 @@ function createSolfegeSynth() {
         }
     });
     
+    global_solfegeSynth.volume.value = document.getElementById("refsynthvol-slider").value;
+
     global_solfegeSynth.toDestination();
 
     global_filter = new Tone.Filter(100, "lowpass").toDestination();
@@ -552,7 +615,9 @@ function createKeySynth() {
             type: "sine"
         }
     });
-    
+
+    global_keySynth.volume.value = document.getElementById("chordsynthvol-slider").value;
+
     global_keySynth.toDestination();
 
 
@@ -602,7 +667,10 @@ function createResolutionSynth() {
           octaves: 4,
           exponent: 2,
         },
-      }).toDestination();
+      });
+      
+      global_resolutionSynth.volume.value = document.getElementById("ressynthvol-slider").value;
+      global_resolutionSynth.toDestination();
 }
 
 

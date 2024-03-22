@@ -71,25 +71,6 @@
         <!-- <div class="white-key" onclick="toggleNote(12, this)"></div> -->
     </div>
 </body>
-<script>
-    function toggleNote(index, keyElement) {
-        // console.log('Playing note:', note);
-        global_scaleNotes[index][4] = !global_scaleNotes[index][4];
-
-        // Toggle the active class to change the color of the clicked key
-        keyElement.classList.toggle('active');
-    }
-
-    function updateRefNote(selectElement) {
-        global_refNote = selectElement.value + '3'; // later, add option to randomize selection of octave
-    }
-
-    function updateBPM(sliderElement) {
-        global_bpm = sliderElement.value;
-    }
-
-</script>
-</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 
@@ -100,12 +81,12 @@
 <p id="current-note">Current solfege note(s): . . .</p>
 
 <p>Chord Volume <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)"></p>
+<p>Solfege/Melody Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)"></p>
 
 </br>
 
 <p><button id="play-button">Play/Pause Key Centers w.r.t. Reference Note</button></p>
 
-<p>Reference Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)"></p>
 <p>Resolution Note Volume <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)"></p>
 
 </br>
@@ -162,7 +143,25 @@
 
 <script src="music.js"></script>
 <script>
+
+    function toggleNote(index, keyElement) {
+        // console.log('Playing note:', note);
+        global_scaleNotes[index][4] = !global_scaleNotes[index][4];
+
+        // Toggle the active class to change the color of the clicked key
+        keyElement.classList.toggle('active');
+    }
+
+    function updateRefNote(selectElement) {
+        global_refNote = selectElement.value + '4'; // later, add option to randomize selection of octave
+    }
+
+    function updateBPM(sliderElement) {
+        global_bpm = sliderElement.value;
+    }
+
     function refsynthvol(t) { global_solfegeSynth.volume.value = t.value;}
+    function ressynthvol(t) { global_resolutionSynth.volume.value = t.value;}
     function melduration(t) { global_melodyNoteDuration = t.value/100.0;}
 
     function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
