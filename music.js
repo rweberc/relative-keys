@@ -211,11 +211,11 @@ document.getElementById("play-button").addEventListener("click", async function(
 
     global_currentGame = "changingSolfege";
 
+    Tone.Transport.bpm.value = global_bpm;
+
     global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
 
       console.debug("Called scheduleRepeat anony func, time: " + time); 
-
-      Tone.Transport.bpm.value = global_bpm;
 
       // Part for reference note
       createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
@@ -258,11 +258,11 @@ document.getElementById("melody-button").addEventListener("click", async functio
 
     global_currentGame = "staticSolfege";
 
+    Tone.Transport.bpm.value = global_bpm;
+
     global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
 
       console.debug("Called scheduleRepeat anony func, time: " + time); 
-
-      Tone.Transport.bpm.value = global_bpm;
 
       // createKeyPart randomizes the key... then the melody is created...
       createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
@@ -373,6 +373,9 @@ function createKeyPattern_changingSolfege(refNote, keyOctaveNum) {
 
 
 function createKeyPattern(contextKey, keyOctaveNum) {
+
+
+  document.getElementById('current-key').textContent = "Current key playing: " + contextKey;
 
     // TODO: possibly update major scale notes to be derived by the matches between global_scaleNotes and the following for the key of C: 
     // inTonal.Scale.get(relativeKeyRoot + " major").notes.map(item => Tonal.Note.simplify(item));

@@ -5,141 +5,298 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relative Tones Practice</title>
     <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 400px;  /* Adjust as needed */
+            margin: 0 auto;
+        }
+
+        .input-container select, .input-container input[type="range"] {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        select, input[type="range"] {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background: lightcoral; /* Green */
+            cursor: pointer;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8.4px;
+            cursor: pointer;
+            background: #999999; /* Gray */
+            border-radius: 1.3px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            background: transparent;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            background: #4CAF50; /* Green */
+            border: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: #999999; /* Gray */
+            border: none;
+        }
+
         .piano {
             display: flex;
-            align-items: flex-start;
+            justify-content: space-between;
+            /* max-width: 800px;  */
         }
+
         .white-key, .black-key {
-            border: 1px solid #000;
-            cursor: pointer;
-            user-select: none;
-        }
-        .white-key {
-            background-color: white;
+            flex: 1;
+            /* margin: 0 5px; */
             height: 100px;
-            width: 30px;
-        }
-        .black-key {
-            background-color: black;
-            height: 60px;
-            width: 20px;
+            /* border-radius: 5px; */
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            /* align-items: center; */
+            /* justify-content: center; */
+            cursor: pointer;
+            color: gold;
+            /* font-size: 4vw; */
             position: relative;
-            margin-left: -10px;
-            margin-right: -10px;
+            cursor: pointer;
+        }
+
+        .black-key {
+            background-color: slategray;
+            color: #fff;
+            height: 65px; /* Adjust as needed */
+            /* margin-top: 20px; Adjust as needed */
+            margin-left: -6.5vw;
+            margin-right: -6.5vw;
+            width: 3vw;
             z-index: 1;
         }
-        .active {
-            background-color: gray;
+
+        .white-key {
+            z-index: 0;
+            width: 3vw;
+            background-color:whitesmoke;
         }
+
+        .white-key.active, .black-key.active {
+            background-color: lightcoral;
+        }
+
+        .solfege {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: gold;
+            font-size: 2.5vw;
+            margin-bottom: 3px
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .tab-button.active {
+            background-color: #ddd;
+        }
+
+        .tab-content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+
     </style>
 </head>
 <body>
-    <label for="musical-notes">Select a reference note:</label>
-    <select id="ref-note" name="ref-note" onchange="updateRefNote(this)">
-        <option value="C" selected>C</option>
-        <option value="C#">C#</option>
-        <option value="D">D</option>
-        <option value="D#">D#</option>
-        <option value="E">E</option>
-        <option value="F">F</option>
-        <option value="F#">F#</option>
-        <option value="G">G</option>
-        <option value="G#">G#</option>
-        <option value="A">A</option>
-        <option value="A#">A#</option>
-        <option value="B">B</option>
-    </select>
+    <div class="input-container">
+        <label for="musical-notes">Select a reference note:</label>
+        <select id="ref-note" name="ref-note" onchange="updateRefNote(this)">
+            <option value="C" selected>C</option>
+            <option value="C#">C#</option>
+            <option value="D">D</option>
+            <option value="D#">D#</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="F#">F#</option>
+            <option value="G">G</option>
+            <option value="G#">G#</option>
+            <option value="A">A</option>
+            <option value="A#">A#</option>
+            <option value="B">B</option>
+        </select>
+    </div>
     <br>
-    <br>
-    <label for="tempo-slider">Adjust tempo:</label>
-    <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
+    <div class="input-container">
+        <label for="tempo-slider">Adjust tempo (stops current game):</label>
+        <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
+    </div>
     <br>
     <br>
     <div class="piano">
-        <div class="white-key" onclick="toggleNote(0, this)"></div>
-        <div class="black-key" onclick="toggleNote(1, this)"></div>
-        <div class="white-key active" onclick="toggleNote(2, this)"></div>
-        <div class="black-key" onclick="toggleNote(3, this)"></div>
-        <div class="white-key active" onclick="toggleNote(4, this)"></div>
-        <div class="white-key active" onclick="toggleNote(5, this)"></div>
-        <div class="black-key" onclick="toggleNote(6, this)"></div>
-        <div class="white-key active" onclick="toggleNote(7, this)"></div>
-        <div class="black-key" onclick="toggleNote(8, this)"></div>
-        <div class="white-key active" onclick="toggleNote(9, this)"></div>
-        <div class="black-key" onclick="toggleNote(10, this)"></div>
-        <div class="white-key active" onclick="toggleNote(11, this)"></div>
+        <div class="white-key" onclick="toggleNote(0, this)"><span class="solfege">do</span></div>
+        <div class="black-key" onclick="toggleNote(1, this)"><span class="solfege">di</span></div>
+        <div class="white-key active" onclick="toggleNote(2, this)"><span class="solfege">re</span></div>
+        <div class="black-key" onclick="toggleNote(3, this)"><span class="solfege">ri</span></div>
+        <div class="white-key active" onclick="toggleNote(4, this)"><span class="solfege">mi</span></div>
+        <div class="white-key active" onclick="toggleNote(5, this)"><span class="solfege">fa</span></div>
+        <div class="black-key" onclick="toggleNote(6, this)"><span class="solfege">fi</span></div>
+        <div class="white-key active" onclick="toggleNote(7, this)"><span class="solfege">sol</span></div>
+        <div class="black-key" onclick="toggleNote(8, this)"><span class="solfege">si</span></div>
+        <div class="white-key active" onclick="toggleNote(9, this)"><span class="solfege">la</span></div>
+        <div class="black-key" onclick="toggleNote(10, this)"><span class="solfege">li</span></div>
+        <div class="white-key active" onclick="toggleNote(11, this)"><span class="solfege">ti</span></div>
         <!-- <div class="white-key" onclick="toggleNote(12, this)"></div> -->
     </div>
+    <div class="input-container"><p id="current-note">Current solfege note(s): . . .</p></div>
+    <div class="input-container"><p id="current-key">Current key playing: . . .</p></div>
+
+
+    <div class="input-container"><p>Chord Volume <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)"></p></div>
+    <div class="input-container"><p>Solfege/Melody Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)"></p></div>
+    <div class="input-container">
+        <select id="scenario-input" onchange="changeScenarioRounds(this);">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <label for="scenario-input">Repeat Each Scenario This Many Times</label>
+    </div>
+    <div class="tabs">
+        <button class="tab-button active" onclick="changeTab(0)">Game 1</button>
+        <button class="tab-button" onclick="changeTab(1)">Game 2</button>
+        <button class="tab-button" onclick="changeTab(2)">Game 3</button>
+    </div>
+    <div class="tab-content active">
+        <div class="input-container"><button id="play-button">Play/Pause Key Centers w.r.t. Reference Note</button></p></div>
+
+        <div class="input-container"><p>Resolution Note Volume <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)"></p></div>    
+    </div>
+    <div class="tab-content">
+        <div class="input-container"><p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p></div>
+
+        <div class="input-container"><p>Melody Note Duration <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);"></p></div>
+
+
+        <!-- <p><label for="mel-duration-slider">Duration:</label>
+            <select id="mel-duration-slider" oninput="melduration(this)">
+                <option value="2n" selected>2</option>
+                <option value="4n">4</option>
+                <option value="5n">8</option>
+            </select></p> -->
+
+        <div class="input-container">
+            <select id="re-base-input" onchange="changeInitialStateRounds(this);">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <label for="re-base-input">Number of Rounds Before Returning to Reference Key Center</label>
+        </div>
+
+        <div class="input-container">
+            <select id="num-base-returns-input" onchange="changeMelodyRounds(this);">
+                <option value="1">1st</option>
+                <option value="2" selected>2nd</option>
+                <option value="3">3rd</option>
+                <option value="4">4th</option>
+            </select>
+            <label for="num-base-returns-input">Re-Randomize Melody After Playing Reference Key Center This Many Times</label>
+        </div>  
+
+
+        <div class="input-container">
+            <select id="num-notes-seq-input">
+                <!-- <option value="0">N/A</option> -->
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+            <label for="num-notes-seq-input">Number of Notes in Melody</label>
+        </div>
+    </div>
+    <div class="tab-content">
+        Mode Game To Be Defined
+    </div>
+  
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.32/Tone.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/tonal/browser/tonal.min.js"></script>
-
-</br>
-
-<p id="current-note">Current solfege note(s): . . .</p>
-
-<p>Chord Volume <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)"></p>
-<p>Solfege/Melody Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)"></p>
-
-</br>
-
-<p><button id="play-button">Play/Pause Key Centers w.r.t. Reference Note</button></p>
-
-<p>Resolution Note Volume <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)"></p>
-
-</br>
-
-<p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p>
-
-<p>Melody Note Duration <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);"></p>
-
-
-<!-- <p><label for="mel-duration-slider">Duration:</label>
-    <select id="mel-duration-slider" oninput="melduration(this)">
-        <option value="2n" selected>2</option>
-        <option value="4n">4</option>
-        <option value="5n">8</option>
-    </select></p> -->
-
-
-<p><label for="scenario-input">Repeat Each Scenario This many Times:</label>
-    <select id="scenario-input" onchange="changeScenarioRounds(this);">
-        <option value="1">1</option>
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select></p>
-
-<p><label for="re-base-input">Number of Rounds Before Returning to Reference Key Center:</label>
-<select id="re-base-input" onchange="changeInitialStateRounds(this);">
-    <option value="1">1</option>
-    <option value="2" selected>2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-</select></p>
-
-<p><label for="num-base-returns-input">Re-Randomize Melody After Playing Reference Key Center This Many Times:</label>
-<select id="num-base-returns-input" onchange="changeMelodyRounds(this);">
-    <option value="1">1st</option>
-    <option value="2" selected>2nd</option>
-    <option value="3">3rd</option>
-    <option value="4">4th</option>
-</select></p>
-
-
-<p><label for="num-notes-seq-input">Number of Notes in Melody:</label>
-<select id="num-notes-seq-input">
-    <!-- <option value="0">N/A</option> -->
-    <option value="1">1</option>
-    <option value="2" selected>2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-</select>
-</p>
 
 <script src="music.js"></script>
 <script>
@@ -157,6 +314,7 @@
     }
 
     function updateBPM(sliderElement) {
+        resetPlayer();
         global_bpm = sliderElement.value;
     }
 
@@ -170,6 +328,24 @@
     function changeScenarioRounds(t) { global_scenarioRepeats = t.value;}
     function changeMelodyRounds(t) { global_totalRoundsToRandomizeMelody = t.value;}
     function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
+
+    function changeTab(tabIndex) {
+        // Get all tab buttons and tab contents
+        var tabButtons = document.querySelectorAll('.tab-button');
+        var tabContents = document.querySelectorAll('.tab-content');
+
+        // Remove the 'active' class from all tab buttons and tab contents
+        for (var i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].classList.remove('active');
+            tabContents[i].classList.remove('active');
+        }
+
+        resetPlayer();
+
+    // Add the 'active' class to the selected tab button and tab content
+    tabButtons[tabIndex].classList.add('active');
+    tabContents[tabIndex].classList.add('active');
+}
 </script>
 
 </html>
