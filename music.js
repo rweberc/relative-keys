@@ -39,7 +39,8 @@ let global_resolutionPart;
 let global_refNote;
 let global_bpm;
 let global_transportPlayId;
-let global_currentGame; // "staticSolfege", "changingSolfege", "modeMelodies"
+let global_currentGame = "changingSolfege"; // "staticSolfege", "changingSolfege", "modeMelodies"
+let global_activeGameTab;
 
 let global_scenarioRepeats;
 let global_scenarioRepeatsCount;
@@ -125,7 +126,7 @@ function initializePlayer() {
   createResolutionSynth();
   createSolfegeSynth();
 
-  global_currentGame = "";
+  //global_currentGame = "";
 
   global_bpm = document.getElementById("tempo-slider").value;
 
@@ -160,6 +161,7 @@ function resetPlayer() {
 
   Tone.Transport.cancel(); // Seems like overkill... but when using global_transportPlayId, seemed to have some delay on being populated when one game would "interrupt" another, and the previous game wouldn't get properly reset
   Tone.Transport.stop();
+  Tone.Transport.cancel(global_transportPlayId); 
 
   // Similar to above, these may also be overkill resets... would require more testing scenarios to confirm.
   global_keySynth.releaseAll();
@@ -189,6 +191,56 @@ function resetPlayer() {
 // =======================================
 // Section: Main Execution On-Click Events
 // =======================================
+
+document.getElementById("transport-button").addEventListener("click", async function() {
+
+  if (Tone.Transport.state !== 'started') {
+
+    // global_currentGame = "changingSolfege";
+
+    Tone.Transport.bpm.value = global_bpm;
+
+    global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+
+      console.debug("Called scheduleRepeat anony func, time: " + time); 
+
+      if (global_currentGame == "staticSolfege") {
+
+        // createKeyPart randomizes the key... then the melody is created...
+        createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
+        createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
+
+      } else if (global_currentGame == "changingSolfege") {
+        
+        // Part for reference note
+        createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
+        createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
+        createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
+
+      } else if (global_currentGame == "modeMelodies") {
+
+        return; // see if I can just return here... or if I need to do something else
+
+      } else {
+
+        return; // see if I can just return here... or if I need to do something else
+
+      }
+
+    }, global_cadenceMeasureLength);
+
+    await Tone.start();
+    Tone.Transport.start();
+
+  } else {
+
+    resetPlayer();
+
+  }
+
+});
+
+
 
 document.getElementById("play-button").addEventListener("click", async function() {
 

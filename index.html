@@ -177,6 +177,48 @@
     </style>
 </head>
 <body>
+    <div class="piano">
+        <div class="white-key" onclick="toggleNote(0, this)"><span class="solfege">do</span></div>
+        <div class="black-key" onclick="toggleNote(1, this)"><span class="solfege">di</span></div>
+        <div class="white-key active" onclick="toggleNote(2, this)"><span class="solfege">re</span></div>
+        <div class="black-key" onclick="toggleNote(3, this)"><span class="solfege">ri</span></div>
+        <div class="white-key active" onclick="toggleNote(4, this)"><span class="solfege">mi</span></div>
+        <div class="white-key active" onclick="toggleNote(5, this)"><span class="solfege">fa</span></div>
+        <div class="black-key" onclick="toggleNote(6, this)"><span class="solfege">fi</span></div>
+        <div class="white-key active" onclick="toggleNote(7, this)"><span class="solfege">sol</span></div>
+        <div class="black-key" onclick="toggleNote(8, this)"><span class="solfege">si</span></div>
+        <div class="white-key active" onclick="toggleNote(9, this)"><span class="solfege">la</span></div>
+        <div class="black-key" onclick="toggleNote(10, this)"><span class="solfege">li</span></div>
+        <div class="white-key active" onclick="toggleNote(11, this)"><span class="solfege">ti</span></div>
+        <!-- <div class="white-key" onclick="toggleNote(12, this)"></div> -->
+    </div>
+
+    <div class="input-container"><p><button id="transport-button">Game start/stop</button></p></div>
+
+    <div class="input-container"><p id="current-note"><b>Current solfege note(s): . . .</b></p></div>
+    <div class="input-container"><p id="current-key"><b>Current key playing: . . .</b></p></div>
+    <div class="input-container">
+        <label for="tempo-slider">Adjust tempo (stops current game):</label>
+        <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
+    </div>
+    <div class="input-container">
+        <label for="chordsynthvol-slider">Chord Volume:</label>
+        <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)">
+    </div>
+    <div class="input-container">
+        <label for="refsynthvol-slider">Solfege/Melody Note Volume:</label>
+        <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)">
+    </div>
+    <div class="input-container">
+        <label for="scenario-input">Repeat Each Scenario This Many Times</label>
+        <select id="scenario-input" onchange="changeScenarioRounds(this);">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    </div>
     <div class="input-container">
         <label for="musical-notes">Select a reference note:</label>
         <select id="ref-note" name="ref-note" onchange="updateRefNote(this)">
@@ -194,44 +236,6 @@
             <option value="B">B</option>
         </select>
     </div>
-    <br>
-    <div class="input-container">
-        <label for="tempo-slider">Adjust tempo (stops current game):</label>
-        <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
-    </div>
-    <br>
-    <br>
-    <div class="piano">
-        <div class="white-key" onclick="toggleNote(0, this)"><span class="solfege">do</span></div>
-        <div class="black-key" onclick="toggleNote(1, this)"><span class="solfege">di</span></div>
-        <div class="white-key active" onclick="toggleNote(2, this)"><span class="solfege">re</span></div>
-        <div class="black-key" onclick="toggleNote(3, this)"><span class="solfege">ri</span></div>
-        <div class="white-key active" onclick="toggleNote(4, this)"><span class="solfege">mi</span></div>
-        <div class="white-key active" onclick="toggleNote(5, this)"><span class="solfege">fa</span></div>
-        <div class="black-key" onclick="toggleNote(6, this)"><span class="solfege">fi</span></div>
-        <div class="white-key active" onclick="toggleNote(7, this)"><span class="solfege">sol</span></div>
-        <div class="black-key" onclick="toggleNote(8, this)"><span class="solfege">si</span></div>
-        <div class="white-key active" onclick="toggleNote(9, this)"><span class="solfege">la</span></div>
-        <div class="black-key" onclick="toggleNote(10, this)"><span class="solfege">li</span></div>
-        <div class="white-key active" onclick="toggleNote(11, this)"><span class="solfege">ti</span></div>
-        <!-- <div class="white-key" onclick="toggleNote(12, this)"></div> -->
-    </div>
-    <div class="input-container"><p id="current-note">Current solfege note(s): . . .</p></div>
-    <div class="input-container"><p id="current-key">Current key playing: . . .</p></div>
-
-
-    <div class="input-container"><p>Chord Volume <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)"></p></div>
-    <div class="input-container"><p>Solfege/Melody Note Volume <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)"></p></div>
-    <div class="input-container">
-        <select id="scenario-input" onchange="changeScenarioRounds(this);">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
-        <label for="scenario-input">Repeat Each Scenario This Many Times</label>
-    </div>
     <div class="tabs">
         <button class="tab-button active" onclick="changeTab(0)">Game 1</button>
         <button class="tab-button" onclick="changeTab(1)">Game 2</button>
@@ -240,12 +244,18 @@
     <div class="tab-content active">
         <div class="input-container"><button id="play-button">Play/Pause Key Centers w.r.t. Reference Note</button></p></div>
 
-        <div class="input-container"><p>Resolution Note Volume <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)"></p></div>    
+        <div class="input-container">
+            <label for="ressynthvol-slider">Resolution Note Volume:</label>
+            <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)">
+        </div>    
     </div>
     <div class="tab-content">
         <div class="input-container"><p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p></div>
 
-        <div class="input-container"><p>Melody Note Duration <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);"></p></div>
+        <div class="input-container">
+            <label for="mel-duration-slider">Melody Note Duration:</label>
+            <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);">
+        </div>
 
 
         <!-- <p><label for="mel-duration-slider">Duration:</label>
@@ -256,6 +266,7 @@
             </select></p> -->
 
         <div class="input-container">
+            <label for="re-base-input">Number of Rounds Before Returning to Reference Key Center</label>
             <select id="re-base-input" onchange="changeInitialStateRounds(this);">
                 <option value="1">1</option>
                 <option value="2" selected>2</option>
@@ -263,21 +274,21 @@
                 <option value="4">4</option>
                 <option value="5">5</option>
             </select>
-            <label for="re-base-input">Number of Rounds Before Returning to Reference Key Center</label>
         </div>
 
         <div class="input-container">
+            <label for="num-base-returns-input">Re-Randomize Melody After Playing Reference Key Center This Many Times</label>
             <select id="num-base-returns-input" onchange="changeMelodyRounds(this);">
                 <option value="1">1st</option>
                 <option value="2" selected>2nd</option>
                 <option value="3">3rd</option>
                 <option value="4">4th</option>
             </select>
-            <label for="num-base-returns-input">Re-Randomize Melody After Playing Reference Key Center This Many Times</label>
         </div>  
 
 
         <div class="input-container">
+            <label for="num-notes-seq-input">Number of Notes in Melody</label>
             <select id="num-notes-seq-input">
                 <!-- <option value="0">N/A</option> -->
                 <option value="1">1</option>
@@ -285,11 +296,10 @@
                 <option value="3">3</option>
                 <option value="4">4</option>
             </select>
-            <label for="num-notes-seq-input">Number of Notes in Melody</label>
         </div>
     </div>
     <div class="tab-content">
-        Mode Game To Be Defined
+        Mode Game To Be Defined...
     </div>
   
 </body>
@@ -340,11 +350,23 @@
             tabContents[i].classList.remove('active');
         }
 
-        resetPlayer();
+        // resetPlayer();
 
     // Add the 'active' class to the selected tab button and tab content
     tabButtons[tabIndex].classList.add('active');
     tabContents[tabIndex].classList.add('active');
+
+    switch (tabIndex) {
+        case 0:
+            global_currentGame = "changingSolfege";
+            break;
+        case 1:
+            global_currentGame = "staticSolfege";
+            break;
+        case 2:
+            global_currentGame = "modeMelodies";
+            break;
+    }
 }
 </script>
 
