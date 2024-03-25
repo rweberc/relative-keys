@@ -194,6 +194,10 @@ function resetPlayer() {
 
 document.getElementById("transport-button").addEventListener("click", async function() {
 
+  //let currentGame = global_currentGame;
+
+  document.getElementById("transport-button").disabled = true;
+
   if (Tone.Transport.state !== 'started') {
 
     // global_currentGame = "changingSolfege";
@@ -238,98 +242,100 @@ document.getElementById("transport-button").addEventListener("click", async func
 
   }
 
+  document.getElementById("transport-button").disabled = false;
+
 });
 
 
 
-document.getElementById("play-button").addEventListener("click", async function() {
+// document.getElementById("play-button").addEventListener("click", async function() {
 
-  let playNow = false;
+//   let playNow = false;
 
-  if (Tone.Transport.state !== 'started') {
+//   if (Tone.Transport.state !== 'started') {
 
-    playNow = true;
+//     playNow = true;
 
-  } else {
+//   } else {
 
-    if (global_currentGame !== "changingSolfege")
-      playNow = true;
+//     if (global_currentGame !== "changingSolfege")
+//       playNow = true;
 
-    resetPlayer();
+//     resetPlayer();
 
-  }
+//   }
 
-  if (playNow) {
+//   if (playNow) {
 
-    global_currentGame = "changingSolfege";
+//     global_currentGame = "changingSolfege";
 
-    Tone.Transport.bpm.value = global_bpm;
+//     Tone.Transport.bpm.value = global_bpm;
 
-    global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+//     global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
 
-      console.debug("Called scheduleRepeat anony func, time: " + time); 
+//       console.debug("Called scheduleRepeat anony func, time: " + time); 
 
-      // Part for reference note
-      createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
-      createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
-      createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
+//       // Part for reference note
+//       createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
+//       createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
+//       createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
 
-    }, global_cadenceMeasureLength);
+//     }, global_cadenceMeasureLength);
 
-    await Tone.start();
-    Tone.Transport.start();
+//     await Tone.start();
+//     Tone.Transport.start();
 
-  } //else {
+//   } //else {
 
-  //   resetPlayer();
+//   //   resetPlayer();
 
-  // }
-});
+//   // }
+// });
 
 
-// TODO: make these on-click functions a bit more generic, so I can just send in the several functions that need to be called
-// TODO: need make this button stop other buttons progress if currently playing.  Right now, just re-using the same global_transportPlayId
-document.getElementById("melody-button").addEventListener("click", async function() {
+// // TODO: make these on-click functions a bit more generic, so I can just send in the several functions that need to be called
+// // TODO: need make this button stop other buttons progress if currently playing.  Right now, just re-using the same global_transportPlayId
+// document.getElementById("melody-button").addEventListener("click", async function() {
 
-  let playNow = false;
+//   let playNow = false;
 
-  if (Tone.Transport.state !== 'started') {
+//   if (Tone.Transport.state !== 'started') {
 
-    playNow = true;
+//     playNow = true;
 
-  } else {
+//   } else {
 
-    if (global_currentGame !== "staticSolfege")
-      playNow = true;
+//     if (global_currentGame !== "staticSolfege")
+//       playNow = true;
 
-    resetPlayer();
+//     resetPlayer();
 
-  }
+//   }
 
-  if (playNow) {
+//   if (playNow) {
 
-    global_currentGame = "staticSolfege";
+//     global_currentGame = "staticSolfege";
 
-    Tone.Transport.bpm.value = global_bpm;
+//     Tone.Transport.bpm.value = global_bpm;
 
-    global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
+//     global_transportPlayId = Tone.Transport.scheduleRepeat((time) => {
 
-      console.debug("Called scheduleRepeat anony func, time: " + time); 
+//       console.debug("Called scheduleRepeat anony func, time: " + time); 
 
-      // createKeyPart randomizes the key... then the melody is created...
-      createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
-      createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
+//       // createKeyPart randomizes the key... then the melody is created...
+//       createKeyPart(time, createKeyPattern_staticSolfege(global_refNote, global_keyOctaveNum));
+//       createSolfegePart(time, createSolfegePattern_staticSolfege(global_refNote, global_keyOctaveNum, global_melodyNoteDuration));
 
-    }, global_cadenceMeasureLength);
+//     }, global_cadenceMeasureLength);
 
-    await Tone.start();
-    Tone.Transport.start();
+//     await Tone.start();
+//     Tone.Transport.start();
 
-  } //else {
+//   } //else {
 
-  //   resetPlayer();
-  // }
-});
+//   //   resetPlayer();
+//   // }
+// });
 
 
 // =====================
