@@ -236,13 +236,17 @@ document.getElementById("transport-button").addEventListener("click", async func
     await Tone.start();
     Tone.Transport.start();
 
+    document.getElementById("transport-button").innerHTML = 'Stop';
+
   } else {
 
     resetPlayer();
 
+    document.getElementById("transport-button").innerHTML = 'Play';
+
   }
 
-  document.getElementById("transport-button").disabled = false;
+  document.getElementById("transport-button").disabled = false; // TODO: should likely update to a 'this' type of reference
 
 });
 
