@@ -44,6 +44,10 @@ let global_activeGameTab;
 
 let global_scenarioRepeats;
 let global_scenarioRepeatsCount;
+
+let global_referenceNoteChangeCount;
+let global_referenceNoteChanges;
+
 let global_roundsToInitialState;
 let global_roundsToInitialStateCount;
 let global_totalRoundsToRandomizeMelody;
@@ -145,6 +149,8 @@ function initializePlayer() {
   //      including: global_totalRoundsToRandomizeMelody, global_totalRoundsToRandomizeMelodyCount = 1
   global_scenarioRepeats = document.getElementById('scenario-input').value;
   global_scenarioRepeatsCount = 1;
+  global_referenceNoteChanges = document.getElementById('ref-count-input').value;
+  global_referenceNoteChangeCount = 1;
   global_roundsToInitialState = document.getElementById('re-base-input').value;
   global_roundsToInitialStateCount = 1;
   global_totalRoundsToRandomizeMelody = document.getElementById('num-base-returns-input').value;
@@ -217,8 +223,8 @@ document.getElementById("transport-button").addEventListener("click", async func
       } else if (global_currentGame == "changingSolfege") {
         
         // Part for reference note
+        createKeyPart(time, createKeyPattern_changingSolfege(global_keyOctaveNum));
         createSolfegePart(time, createSolfegePattern_changingSolfege(global_refNote, global_cadenceMeasureLength));
-        createKeyPart(time, createKeyPattern_changingSolfege(global_refNote, global_keyOctaveNum));
         createResolutionPart(time, createResolutionPattern(global_currentKeyNotes, global_refNote, global_keyOctaveNum));
 
       } else if (global_currentGame == "modeMelodies") {
@@ -410,12 +416,23 @@ function createSolfegePattern_changingSolfege(refNote, cadenceMeasureLength) {
 }
 
 
-function createKeyPattern_changingSolfege(refNote, keyOctaveNum) {
+function createKeyPattern_changingSolfege(keyOctaveNum) {
 
     // TODO: for this game, global_currentSolfege does not need to be global... but I think for the static solfege game, it does
 
     // deciding on the key advance here should be moved
+    // TODO: update this with the mod logic for the scenarioRepeatsCount increments
     if (global_scenarioRepeatsCount == 1) {
+
+        // Decide whether to randomize the reference note
+        if (global_referenceNoteChanges != 0 && global_referenceNoteChangeCount >= global_referenceNoteChanges) {
+          let possibleReferenceNotes = global_scaleNotes.filter(item => item[0] != global_refNote).map(item => item[0]);
+          global_refNote = possibleReferenceNotes[Math.floor(Math.random() * possibleReferenceNotes.length)][0];
+          document.getElementById('ref-note').value = global_refNote;
+        }
+
+        global_referenceNoteChangeCount = (global_referenceNoteChangeCount % (global_referenceNoteChanges)) + 1;
+
         global_currentSolfegeWRT_C = randomizeScaleDegree(global_scaleNotes); // should remove current scaleNoteDegree from options
         console.debug(global_scenarioRepeatsCount); 
         global_scenarioRepeatsCount += 1;
@@ -428,7 +445,7 @@ function createKeyPattern_changingSolfege(refNote, keyOctaveNum) {
         global_scenarioRepeatsCount = 1;
     }
 
-    let contextKey = getContextScale(refNote, global_currentSolfegeWRT_C);
+    let contextKey = getContextScale(global_refNote, global_currentSolfegeWRT_C);
 
     return createKeyPattern(contextKey, keyOctaveNum)
 }

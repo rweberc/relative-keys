@@ -39,14 +39,14 @@
         .section-divider {
             height: 2px; /* Adjust as needed */
             background-color: #ccc; /* Adjust as needed */
-            width: 50%; /* Adjust as needed */
+            width: 350px; /* Adjust as needed */
             margin: 20px auto; /* Adjust as needed */
         }
 
         .sub-section-divider {
             height: 2px; /* Adjust as needed */
-            background-color: #ccc; /* Adjust as needed */
-            width: 25%; /* Adjust as needed */
+            background-color: whitesmoke; /* Adjust as needed */
+            width: 100px; /* Adjust as needed */
             margin: 20px auto; /* Adjust as needed */
         }
 
@@ -237,7 +237,18 @@
         <div class="input-container">
             <label for="ressynthvol-slider">Resolution Note Volume:</label>
             <input type="range" id="ressynthvol-slider" name="ressynthvol" min="-10" max="10" value ="-6" oninput="ressynthvol(this)">
-        </div>    
+        </div>  
+        <div class="input-container">
+            <label for="ref-count-input">Repeat Each Scenario</label>
+            <select id="ref-count-input" onchange="changeRefCont(this);">
+                <option value="0" selected>N/A</option>
+                <option value="1">3</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+            </select> Time(s)
+        </div>  
     </div>
     <div class="tab-content">
         <!-- <div class="input-container"><p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p></div> -->
@@ -296,8 +307,7 @@
         <label for="tempo-slider">Adjust tempo (stops current game):</label>
         <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
     </div>
-    <br>
-    <br>
+    <div class="sub-section-divider"></div>
     <div class="input-container">
         <label for="chordsynthvol-slider">Key Volume:</label>
         <input type="range" id="chordsynthvol-slider" name="chordsynthvol" min="-10" max="10" value="-2" oninput="chordsynthvol(this)">
@@ -306,8 +316,7 @@
         <label for="refsynthvol-slider">Solfege/Melody Note Volume:</label>
         <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)">
     </div>
-    <br>
-    <br>
+    <div class="sub-section-divider"></div>
     <div class="input-container">
         <label for="scenario-input">Repeat Each Scenario</label>
         <select id="scenario-input" onchange="changeScenarioRounds(this);">
@@ -364,6 +373,8 @@
     function refsynthvol(t) { global_solfegeSynth.volume.value = t.value;}
     function ressynthvol(t) { global_resolutionSynth.volume.value = t.value;}
     function melduration(t) { global_melodyNoteDuration = t.value/100.0;}
+
+    function changeRefCont(t) { global_referenceNoteChanges = t.value;}
 
     function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
 
