@@ -820,7 +820,7 @@ function createKeyPattern_staticSolfege(refNote, keyOctaveNum) {
 
   }
 
-  global_scenarioRepeatsCount = (global_scenarioRepeatsCount % global_scenarioRepeats) + 1;
+  global_scenarioRepeatsCount = (global_scenarioRepeatsCount % global_scenarioRepeats) + 1; // TODO: really not sure this makes sense here... should it be done in the createSolfegePattern_staticSolfege function?
 
   // console.debug("global_currentKey end: " + global_currentKey);
 
@@ -997,6 +997,18 @@ function createSolfegeSynth() {
 
     global_filter = new Tone.Filter(100, "lowpass").toDestination();
     global_solfegeSynth.connect(global_filter); 
+
+    // // Create an LFO to modulate the amplitude of the synth
+    let lfo = new Tone.LFO(frequency = .20, min = .2, max = .7).start();
+
+    // // Create a gain node to control the amplitude of the synth
+    let gain = new Tone.Gain().toDestination();
+
+    // // Connect the LFO to the gain node
+    lfo.connect(gain.gain);
+
+    // // Connect the synth to the gain node
+    global_solfegeSynth.connect(gain);
 }
 
 
