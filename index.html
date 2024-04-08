@@ -50,7 +50,7 @@
             margin: 20px auto; /* Adjust as needed */
         }
 
-        select, input[type="range"] {
+        select, checkbox, input[type="range"] {
             flex: 1;
             margin-right: 10px;
             margin-top: 5px;
@@ -61,6 +61,12 @@
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             align-items: center;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
         }
         
         input[type="range"] {
@@ -224,8 +230,9 @@
 
     <div class="input-container"><p><button id="transport-button">Play</button></p></div>
 
-    <div class="input-container"><p id="current-note"><b>Current solfege note(s): . . .</b></p></div>
-    <div class="input-container"><p id="current-key"><b>Current key playing: . . .</b></p></div>
+    <div class="input-container"><p id="current-note">Current solfege note(s): . . .</p></div>
+    <div class="input-container"><p id="current-key">Current key playing: . . .</p></div>
+    <div class="input-container"><p id="current-mode">Current mode playing: . . .</p></div>
     <div class="tabs">
         <button class="tab-button active" onclick="changeTab(0)">Game 1</button>
         <button class="tab-button" onclick="changeTab(1)">Game 2</button>
@@ -252,12 +259,7 @@
     </div>
     <div class="tab-content">
         <!-- <div class="input-container"><p><button id="melody-button">Play/Pause Melody w.r.t. Key Centers</button></p></div> -->
-
-        <div class="input-container">
-            <label for="mel-duration-slider">Melody Note Duration:</label>
-            <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="1" oninput="melduration(this);">
-        </div>
-
+        <!-- removed melody duration slider -->
 
         <!-- <p><label for="mel-duration-slider">Duration:</label>
             <select id="mel-duration-slider" oninput="melduration(this)">
@@ -287,22 +289,48 @@
             </select> Time(s) 
         </div>  
 
-
+    </div>
+    <div class="tab-content">
         <div class="input-container">
-            <label for="num-notes-seq-input">Number of Notes in Melody</label>
-            <select id="num-notes-seq-input">
-                <!-- <option value="0">N/A</option> -->
+            <fieldset>
+                <legend>Mode Select:</legend>
+                <input type="checkbox" id="Ionian" name="modes" value="0" onchange="modeUpdateFunction();" checked>
+                <label for="Ionian">Ionian</label>
+                <input type="checkbox" id="Dorian" name="modes" value="1" onchange="modeUpdateFunction();" checked>
+                <label for="Dorian">Dorian</label>
+                <input type="checkbox" id="Phrygian" name="modes" value="2" onchange="modeUpdateFunction();" checked>
+                <label for="Phrygian">Phrygian</label>
+                <input type="checkbox" id="Lydian" name="modes" value="3" onchange="modeUpdateFunction();" checked>
+                <label for="Lydian">Lydian</label><br>
+                <input type="checkbox" id="Mixolydian" name="modes" value="4" onchange="modeUpdateFunction();" checked>
+                <label for="Mixolydian">Mixolydian</label>
+                <input type="checkbox" id="Aeolian" name="modes" value="5" onchange="modeUpdateFunction();" checked>
+                <label for="Aeolian">Aeolian</label>
+                <input type="checkbox" id="Locrian" name="modes" value="6" onchange="modeUpdateFunction();" checked>
+                <label for="Locrian">Locrian</label><br>
+            </fieldset>
+        </div>
+        <br>
+        <div class="input-container">
+            <label for="num-mel-rounds-input">Rounds Before Randomizing Melody</label>
+            <select id="num-mel-rounds-input" onchange="changeMelodyModeRounds(this);">
                 <option value="1">1</option>
                 <option value="2" selected>2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
             </select>
-        </div>
+        </div> 
+
     </div>
-    <div class="tab-content">
-        Mode Game To Be Defined...
-    </div>
+    <br>
     <div class="section-divider"></div>
+    <br>
+    <div class="input-container">
+        <label for="speak-solfege-checkbox">Speak Hints:</label>
+        <input type="checkbox" id="speak-solfege-checkbox" onchange="speaksolfege(this)" checked>
+    </div>
     <div class="input-container">
         <label for="tempo-slider">Adjust tempo (stops current game):</label>
         <input type="range" id="tempo-slider" name="tempo" min="60" max="280" value="180" onchange="updateBPM(this)">
@@ -316,7 +344,21 @@
         <label for="refsynthvol-slider">Solfege/Melody Note Volume:</label>
         <input type="range" id="refsynthvol-slider" name="refsynthvol" min="-10" max="10" value="0" oninput="refsynthvol(this)">
     </div>
+    <div class="input-container">
+        <label for="mel-duration-slider">Melody Note Duration:</label>
+        <input type="range" id="mel-duration-slider" name="mel-duration-slider" min="0" max="100" value="25" oninput="melduration(this);">
+    </div>
     <div class="sub-section-divider"></div>
+    <div class="input-container">
+        <label for="num-notes-seq-input">Number of Notes in Melody</label>
+        <select id="num-notes-seq-input">
+            <!-- <option value="0">N/A</option> -->
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+    </div>
     <div class="input-container">
         <label for="scenario-input">Repeat Each Scenario</label>
         <select id="scenario-input" onchange="changeScenarioRounds(this);">
@@ -373,6 +415,7 @@
     function refsynthvol(t) { global_solfegeSynth.volume.value = t.value;}
     function ressynthvol(t) { global_resolutionSynth.volume.value = t.value;}
     function melduration(t) { global_melodyNoteDuration = t.value/100.0;}
+    function speaksolfege(t) { global_speakSolfege = t.checked;}
 
     function changeRefCont(t) { global_referenceNoteChanges = t.value;}
 
@@ -383,6 +426,8 @@
     function changeMelodyRounds(t) { global_totalRoundsToRandomizeMelody = t.value;}
     function changeInitialStateRounds(t) { global_roundsToInitialState = t.value;}
 
+    function changeMelodyModeRounds(t) { global_totalRoundsToRandomizeModeMelody = t.value;}
+    function modeUpdateFunction() {global_selectedModes = Array.from(document.querySelectorAll('input[name="modes"]:checked')).map(input => input.value);}
     function changeTab(tabIndex) {
         // Get all tab buttons and tab contents
         var tabButtons = document.querySelectorAll('.tab-button');
