@@ -256,13 +256,6 @@ function resetPlayer() {
 
 document.getElementById("transport-button").addEventListener("click", async function() {
 
-  let utterance = new SpeechSynthesisUtterance("bingo");
-  utterance.volume = 1; // From 0 to 1
-  utterance.pitch = .9;
-  // var voices = window.speechSynthesis.getVoices();
-  // utterance.voice = voices[10]; 
-  speechSynthesis.speak(utterance);
-
   //let currentGame = global_currentGame;
 
   document.getElementById("transport-button").disabled = true;
