@@ -395,6 +395,21 @@
 <script src="music.js"></script>
 <script>
 
+    let hasEnabledVoice = false;
+
+    // iOS fix to have speech synthesis accepted as triggered by user action (possibly the async on transport-button prevents it from being recognized as user action)
+    document.addEventListener('click', function() {
+        if (hasEnabledVoice) {
+            return;
+        }
+        const placeholder = new SpeechSynthesisUtterance('placeholder');
+        placeholder.volume = 0;
+        speechSynthesis.speak(placeholder);
+        hasEnabledVoice = true;
+    });
+
+
+
     function toggleNote(index, keyElement) {
         // console.log('Playing note:', note);
         global_scaleNotes[index][4] = !global_scaleNotes[index][4];
@@ -408,12 +423,6 @@
     }
 
     function updateBPM(sliderElement) {
-        let utterance = new SpeechSynthesisUtterance("bingo");
-  utterance.volume = 1; // From 0 to 1
-  utterance.pitch = .9;
-  // var voices = window.speechSynthesis.getVoices();
-  // utterance.voice = voices[10]; 
-  speechSynthesis.speak(utterance);
         resetPlayer();
         global_bpm = sliderElement.value;
     }
